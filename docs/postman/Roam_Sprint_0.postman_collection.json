@@ -1,0 +1,91 @@
+{
+  "info": {
+    "_postman_id": "roam-sprint-0-collection",
+    "name": "Roam API - Sprint 0",
+    "description": "Postman collection for Roam API Foundation & Health (Sprint 0)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "health"]
+        },
+        "description": "Checks the operational status of the Roam API and MongoDB connection state."
+      },
+      "response": [
+        {
+          "name": "Successful Health Response",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\n  \"success\": true,\n  \"data\": {\n    \"status\": \"healthy\",\n    \"timestamp\": \"2026-11-22T08:00:00.000Z\",\n    \"uptime\": 12,\n    \"database\": \"connected\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Not Found Error (Envelope Test)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/non-existent-endpoint",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "non-existent-endpoint"]
+        },
+        "description": "Verifies 404 response envelope format."
+      },
+      "response": [
+        {
+          "name": "Not Found Response Envelope",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/non-existent-endpoint",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "non-existent-endpoint"]
+            }
+          },
+          "status": "Not Found",
+          "code": 404,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"NOT_FOUND\",\n    \"message\": \"Route GET /api/non-existent-endpoint not found\"\n  }\n}"
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    }
+  ]
+}

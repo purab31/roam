@@ -1,0 +1,27 @@
+{
+  "name": "roam",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Roam - Pre-owned vehicle buying, selling, and rental marketplace",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=server & npm run dev --workspace=client",
+    "dev:server": "npm run dev --workspace=server",
+    "dev:client": "npm run dev --workspace=client",
+    "test": "npm run test --workspace=server",
+    "build:client": "npm run build --workspace=client",
+    "lint": "npm run lint --workspace=server && npm run lint --workspace=client",
+    "postinstall": "node -e \"const fs = require('fs'); const p = 'node_modules/rollup/dist/native.js'; if (fs.existsSync(p)) fs.writeFileSync(p, 'module.exports = require(\\'../../@rollup/wasm-node/dist/native.js\\');');\"",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\""
+  },
+  "devDependencies": {
+    "@rollup/wasm-node": "^4.28.1",
+    "prettier": "^3.3.3"
+  },
+  "overrides": {
+    "rollup": "npm:@rollup/wasm-node@^4.28.1"
+  }
+}
