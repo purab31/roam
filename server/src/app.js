@@ -3,7 +3,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const config = require('./config/env');
-const apiLimiter = require('./middleware/rateLimiter');
+const { apiLimiter } = require('./middleware/rateLimiter');
 const errorHandler = require('./middleware/errorHandler');
 const {
   NotFoundError,
@@ -14,6 +14,8 @@ const {
 } = require('./errors');
 
 const healthRoutes = require('./routes/health.routes');
+const authRoutes = require('./routes/auth.routes');
+const userRoutes = require('./routes/user.routes');
 
 const app = express();
 
@@ -45,11 +47,13 @@ app.use(cookieParser());
 app.use(express.json({ limit: config.bodyLimit }));
 app.use(express.urlencoded({ extended: true, limit: config.bodyLimit }));
 
-// Rate limiter for API routes
+// Rate limiter for general API routes
 app.use('/api', apiLimiter);
 
 // Mount API routes
 app.use('/api', healthRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 // Test routes for verifying error handling in non-production
 if (config.nodeEnv === 'test') {

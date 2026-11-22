@@ -1,71 +1,75 @@
 # Progress
 
 ## Current sprint
-Sprint 0: Design sprint and foundation. Status: done.
+Sprint 1: Authentication, capabilities, profiles. Status: done.
 
 ## Done
-- **Monorepo Structure**: Set up `/client` (Vite, React 18, Tailwind CSS, Lucide icons) and `/server` (Node 20, Express, Mongoose, Zod, Helmet, Rate-limit, Jest/Supertest).
-- **Environment & Code Quality**: Added root `.gitignore`, `.prettierrc`, root `package.json` workspaces, `.env.example` templates, ESLint configs (0 errors, 0 warnings across both workspaces).
-- **Server Foundation**:
-  - Express app configured with `helmet`, `cors` (credentials support & origin validation), `cookie-parser`, JSON payload limit (`1mb`), and `express-rate-limit`.
-  - Mongoose connection module with connection lifecycle events and graceful disconnect.
-  - Typed error classes in `server/src/errors/`: `ValidationError`, `AuthError`, `ForbiddenError`, `NotFoundError`, and `ConflictError`.
-  - Central error handling middleware adhering strictly to standard response envelope: `{ success: false, error: { code, message, fields? } }`.
-  - Health check endpoint `GET /api/health` returning `{ success: true, data: { status, timestamp, uptime, database } }`.
-  - Complete Supertest suite in `server/tests/health.test.js` covering 200 health check, 404 route not found envelope, malformed JSON handling, and all typed AppError classes with expected HTTP codes and payloads (100% passing).
-  - Postman collection for Sprint 0 saved to `docs/postman/Roam_Sprint_0.postman_collection.json`.
-- **Client Design System & Tokens**:
-  - Imported Google Font **Urbanist** (weights 300, 400, 500, 600, 700).
-  - Full CSS variable tokens mapped for Light and Dark themes per UI spec sections 2.2 and 13 (`--bg`, `--bg-subtle`, `--surface`, `--tile`, `--border`, `--text`, `--text-muted`, `--text-faint`, `--primary`, `--on-primary`, `--accent`, `--on-accent`, `--star`, `--dark-band-bg`, `--dark-band-text`, `--success`, `--warning`, `--danger`).
-  - Mapped tokens directly into Tailwind configuration classes (`bg-surface`, `bg-tile`, `text-muted`, `border-border`, etc.).
-  - Zero hard-coded colors in all components.
-  - Universal accessible focus ring: `2px --text with 2px offset`.
-  - Theme system implemented per UI Section 2.1:
-    - Inline no-flash script in `index.html` executing before first paint.
-    - Theme persistence in `localStorage: theme = light | dark | system`.
-    - `prefers-color-scheme` listener for `system` preference.
-    - `prefers-reduced-motion` support.
-    - Theme toggle component: 56 × 32 px pill, 24px sliding circular thumb (200ms ease-out), sun/moon icons, `role="switch"`, `aria-checked`, `aria-label="Toggle dark mode"`.
-- **UI Component Library (UI Section 7)**:
-  - `Button`: pill-shaped, variants (`primary`, `secondary`, `ghost`, `onDark`, `destructive`, `text`, `more`), sizes (`lg` 44px, `sm` 36px).
-  - `Input`: pill input (44px), 1px border, 16px padding, 12px faint placeholder, 2px focus ring, 11px muted label, 11px danger error.
-  - `Select` & `Textarea`: 16px radius, 1px border, 2px focus ring.
-  - `Chip`: 24px high pill on `--tile`.
-  - `StatusChip`: 12% tinted background + solid text + semantic icon for all 8 statuses (`Available`, `Pending`, `Negotiating`, `Accepted`, `Rejected`, `Booked`, `Returned`, `Expired`).
-  - `Badge`: accent discount badge (`-8% off`, 6px radius) and count/dot badges.
-  - `Tabs`: 48px height, 1px baseline border, sliding 2px underline (250ms), superscript count support.
-  - `Skeleton`: vehicle cut-out tile skeleton and card skeletons.
-  - `EmptyState`: vehicle cut-out illustration on 24px tile, 24px/300 heading, muted body, pill CTA.
-  - `Modal`: 24px radius, backdrop blur, keyboard escape handler, focus trapping.
-  - `Toast`: accessible notification toasts with auto-dismiss and semantic variants.
-  - `AnnouncementBar` (UI 7.1): full-width, 30px height, `--accent` background, 11px white text, divider, inline link, dismiss button.
-  - `Header` (UI 7.2): sticky 64px header, blur (12px) and 1px bottom border after 8px scroll, circular logo mark + "Roam" wordmark, center links, right cluster (Theme toggle, language switch, outlined pill), mobile drawer.
-  - `Footer` (UI 7.14): dark band, logo + "Request a call back" pill, 4 link columns + location tabs, giant cropped "Roam" wordmark (24vw) filling container width, bottom copyright bar.
-- **Design System Showcase Page**:
-  - Live `/design-system` route showcasing every token, component, interactive state, and responsive viewport simulators for 375px (Mobile), 768px (Tablet), and 1280px (Desktop).
+- **Backend User Model**:
+  - Implemented `User` Mongoose schema in `server/src/models/user.model.js` supporting `fullName`, `email` (unique, lowercase), `mobile` (unique, validated format), `passwordHash` (bcrypt salt 12), `capabilities[]` (`buyer`, `renter`, `seller`, `dealer`, `admin`), `accountStatus` (`active`, `deactivation_requested`, `deactivated`, `blocked`), `contactVisibility` (`email`, `mobile`), `profilePhoto`, `resetPasswordToken` (SHA-256 hashed), `resetPasswordExpires`, and timestamps.
+  - Model methods: `comparePassword`, `createPasswordResetToken` (single-use with 15-minute expiry), `toSafeObject` and `toJSON` transform (stripping password hash and reset tokens).
+- **Authentication & User REST Endpoints**:
+  - `POST /api/auth/register`: registration with duplicate email and duplicate mobile checks, bcrypt hashing, safe capabilities initialization, and JWT issued in `httpOnly` cookie.
+  - `POST /api/auth/login`: credential authentication, password comparison, blocked account prevention, rate limiting, and JWT cookie issue.
+  - `POST /api/auth/logout`: clears httpOnly auth cookie.
+  - `POST /api/auth/forgot-password`: single-use token generation with console print in development.
+  - `POST /api/auth/reset-password`: validates single-use token, checks 15-min expiry, updates password hash, and invalidates token.
+  - `GET /api/users/profile`: returns authenticated user profile.
+  - `PUT /api/users/profile`: updates full name, mobile (with uniqueness re-check), contact visibility flags, and profile photo.
+  - `PUT /api/users/password`: validates current password and updates to new bcrypt-hashed password.
+  - `PATCH /api/users/account-status`: records user deactivation request (`deactivation_requested`) for administrative review.
+  - `POST /api/users/capabilities`: enables multi-role capability addition (e.g. adding `seller`).
+- **Security & Middleware**:
+  - `requireAuth`: validates JWT from httpOnly cookie or `Bearer` token header, handles expired sessions with clear `AUTH_ERROR` code, and verifies account is not blocked.
+  - `requireCapability(...caps)`: enforces role permissions with `FORBIDDEN_ERROR` (e.g. buyers cannot hit seller endpoints; admins bypass role restrictions).
+  - `requireActiveAccount`: blocks deactivated or blocked users from performing mutating create/write actions.
+  - Rate limiting on `/api/auth/login` and `/api/auth/forgot-password`.
+  - Zod validation for every request body with typed `ValidationError` and field-level error mapping.
+- **Admin Seeding Script**:
+  - `server/scripts/seedAdmin.js`: creates or updates an admin user with all capabilities from environment variables.
+- **Supertest Test Suite**:
+  - `server/tests/auth.test.js`: 21 tests covering duplicate email (409), duplicate mobile (409), invalid credentials (401), missing required fields (400), password mismatch (400), expired/invalid tokens (401/400), profile updates, password change, deactivation request, capability addition, seller endpoint protection (403 for buyer-only), and deactivated account write blocking (403). Total 28 tests passing across test suites.
+- **Postman Collection**:
+  - Exported complete Sprint 1 collection to `docs/postman/Roam_Sprint_1.postman_collection.json`.
+- **Frontend Auth & Onboarding (UI 8.10)**:
+  - Split-screen auth layout (`AuthLayout.jsx`) with 420px form column, pill inputs, right-side dark brand panel with vehicle cut-out silhouette, responsive stacking on mobile.
+  - `LoginPage.jsx`: email/password login with redirect handling.
+  - `RegisterPage.jsx`: multi-role onboarding tiles (`Buyer / Renter`, `Individual Seller`, `Dealer`) with instant capability pre-selection, full name, mobile, and terms validation.
+  - `ForgotPasswordPage.jsx` & `ResetPasswordPage.jsx`: password recovery flow with query-param token auto-fill.
+  - Inline error messages beneath all fields (11px `--danger`).
+- **Frontend Architecture & Navigation (UI 7.2 & 8.8)**:
+  - `AuthProvider.jsx` powered by TanStack Query for session management.
+  - `ProtectedRoute.jsx` and `CapabilityRoute.jsx` with automatic redirect and return after login.
+  - Header logged-in cluster: Notification bell with red accent dot, avatar circle with dropdown menu showing user details, capability badges, navigation links, and sign out.
+  - `DashboardLayout.jsx`: Slim sidebar with 2px solid left active line, top bar (search, theme toggle, bell, avatar), mobile bottom tab bar (< 768px), and capability-based navigation items.
+  - `DashboardPage.jsx`: Welcome banner with status chip, stat cards (40px/300 number, 11px label), multi-role upgrade banner, and activity timeline placeholder.
+  - `ProfilePage.jsx`: Contact info editing, public contact visibility switches (`Show email on public listings`, `Show mobile on public listings`), and capability status management.
+  - `SettingsPage.jsx`: Password change form, account lifecycle card with status chip, and account deactivation request with confirmation modal.
 
 ## Deferred
-- None from Sprint 0 scope. (Feature pages and workflows deliberately deferred to Sprint 1+ as specified).
+- Vehicle models, photo uploader wizard, and listing management (Sprint 2).
+- Public marketplace discovery, vehicle browse, and search filters (Sprint 3).
 
 ## Decisions made
-- Rollup Wasm Fallback: Enabled `@rollup/wasm-node` fallback in npm overrides to ensure seamless Vite development and bundling across environments where native Windows MSVC `.node` binary execution might encounter restrictive host policies.
-- Status Chips: Provided 12% opacity color backgrounds paired with full-contrast solid text and unique icons (`CheckCircle2`, `Clock`, `MessageSquare`, `Check`, `XCircle`, `Calendar`, `RotateCcw`, `AlertTriangle`) ensuring WCAG accessibility compliance where color is never the only indicator.
+- Token Storage: Stored JWT in `httpOnly`, `SameSite=Lax` (or `None` in cross-origin production) cookie named `roam_token`, with fallback support for `Authorization: Bearer <token>` in automated tools/Postman.
+- Multi-Role Support: Registered users maintain an array of `capabilities[]`. Any user can add the `seller` capability at any time from their profile or dashboard without needing a separate account.
+- Deactivation Flow: Deactivation requests set `accountStatus: 'deactivation_requested'` so administrators can review pending transactions before finalizing deactivation, retaining data needed for legal settlement and active bookings.
 
 ## Open questions
-- None blocking Sprint 1.
+- None blocking Sprint 2.
 
 ## How to run
 - **Server**:
   ```bash
   cd server
-  npm test       # Run Supertest test suite
-  npm run dev    # Start API server on http://localhost:5000
+  npm test              # Run 28 unit and integration tests
+  npm run dev           # Start Express API server (http://localhost:5000)
+  node scripts/seedAdmin.js  # Seed platform administrator account
   ```
 - **Client**:
   ```bash
   cd client
-  npm run build  # Verify production bundle build
-  npm run dev    # Start Vite dev server on http://localhost:5173
+  npm run build         # Verify client build
+  npm run dev           # Start Vite dev server (http://localhost:5173)
   ```
 - **Postman**:
-  Import `docs/postman/Roam_Sprint_0.postman_collection.json` into Postman and point `{{baseUrl}}` to `http://localhost:5000`.
+  Import `docs/postman/Roam_Sprint_1.postman_collection.json` and set `{{baseUrl}}` to `http://localhost:5000`.
