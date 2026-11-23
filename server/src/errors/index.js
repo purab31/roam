@@ -22,8 +22,8 @@ class AuthError extends AppError {
 }
 
 class ForbiddenError extends AppError {
-  constructor(message = 'Access forbidden') {
-    super(message, 403, 'FORBIDDEN_ERROR');
+  constructor(message = 'Access forbidden', code = 'FORBIDDEN_ERROR') {
+    super(message, 403, code);
   }
 }
 
@@ -34,8 +34,8 @@ class NotFoundError extends AppError {
 }
 
 class ConflictError extends AppError {
-  constructor(message = 'Conflict detected') {
-    super(message, 409, 'CONFLICT_ERROR');
+  constructor(message = 'Conflict detected', code = 'CONFLICT_ERROR') {
+    super(message, 409, code);
   }
 }
 

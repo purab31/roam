@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{baseUrl}}/api/listings"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "vehicleId": "{{vehicleId}}",
+      "purpose": "sale",
+      "saveAsDraft": false,
+      "sale": {
+        "askingPrice": 185000000,
+        "negotiable": true,
+        "minAcceptableOffer": 175000000,
+        "description": "Immaculate single-owner Innova Crysta ZX with complete service records."
+      }
+    }
+order: 3000

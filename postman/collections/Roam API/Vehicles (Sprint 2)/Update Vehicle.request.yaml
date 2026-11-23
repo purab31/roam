@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{baseUrl}}/api/vehicles/{{vehicleId}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "colour": "Metallic Grey"
+    }
+order: 4000

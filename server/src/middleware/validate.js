@@ -1,8 +1,9 @@
 const { ValidationError } = require('../errors');
 
-function validate(schema) {
+function validate(schema, source = 'body') {
   return (req, _res, next) => {
-    const result = schema.safeParse(req.body);
+    const dataToValidate = source === 'query' ? req.query : req.body;
+    const result = schema.safeParse(dataToValidate);
 
     if (!result.success) {
       const fieldErrors = {};
@@ -13,7 +14,11 @@ function validate(schema) {
       return next(new ValidationError('Validation failed', fieldErrors));
     }
 
-    req.body = result.data;
+    if (source === 'query') {
+      req.validatedQuery = result.data;
+    } else {
+      req.body = result.data;
+    }
     next();
   };
 }

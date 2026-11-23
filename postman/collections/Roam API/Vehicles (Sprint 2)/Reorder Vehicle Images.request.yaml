@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{baseUrl}}/api/vehicles/{{vehicleId}}/images/reorder"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "imageIds": ["{{imageId}}"]
+    }
+order: 8000

@@ -5,6 +5,7 @@ import {
   Heart,
   MessageSquare,
   Car,
+  Tag,
   Building2,
   ShieldCheck,
   User as UserIcon,
@@ -12,6 +13,13 @@ import {
   LogOut,
   Search,
   Bell,
+  Compass,
+  Upload,
+  HandCoins,
+  Calendar,
+  Users,
+  Flag,
+  FileCode,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { ThemeToggle } from '../ui/ThemeToggle';
@@ -43,16 +51,39 @@ export function DashboardLayout({ children }) {
       ? [
           { label: 'Saved Vehicles', icon: Heart, path: '/dashboard/saved' },
           { label: 'My Enquiries', icon: MessageSquare, path: '/dashboard/enquiries' },
+          ...(hasCapability('renter')
+            ? [{ label: 'My Bookings', icon: Calendar, path: '/dashboard/bookings' }]
+            : []),
         ]
       : []),
     ...(hasCapability('seller')
-      ? [{ label: 'My Listings', icon: Car, path: '/dashboard/listings' }]
+      ? [
+          { label: 'My Vehicles', icon: Car, path: '/dashboard/vehicles' },
+          { label: 'My Listings', icon: Tag, path: '/dashboard/listings' },
+          { label: 'Rental Requests', icon: Calendar, path: '/dashboard/rental-requests' },
+        ]
       : []),
     ...(hasCapability('dealer')
-      ? [{ label: 'Dealer Inventory', icon: Building2, path: '/dashboard/inventory' }]
+      ? [
+          { label: 'Dealer Inventory', icon: Building2, path: '/dashboard/inventory' },
+          { label: 'Discover Owners', icon: Compass, path: '/dashboard/discover' },
+          { label: 'Bulk CSV Upload', icon: Upload, path: '/dashboard/inventory/upload' },
+          { label: 'Offers Sent', icon: HandCoins, path: '/dashboard/dealer-offers' },
+          { label: 'Rental Requests', icon: Calendar, path: '/dashboard/rental-requests' },
+        ]
       : []),
     ...(hasCapability('admin')
-      ? [{ label: 'Moderation Queue', icon: ShieldCheck, path: '/dashboard/admin' }]
+      ? [
+          { label: 'Admin Overview', icon: ShieldCheck, path: '/dashboard/admin' },
+          { label: 'Moderation Queue', icon: Tag, path: '/dashboard/admin/listings' },
+          { label: 'User Accounts', icon: Users, path: '/dashboard/admin/users' },
+          { label: 'Dealer Verifications', icon: Building2, path: '/dashboard/admin/dealers' },
+          { label: 'Policy Reports', icon: Flag, path: '/dashboard/admin/reports' },
+          { label: 'Offers Oversight', icon: HandCoins, path: '/dashboard/admin/offers' },
+          { label: 'Bookings Oversight', icon: Calendar, path: '/dashboard/admin/bookings' },
+          { label: 'Platform Settings', icon: Settings, path: '/dashboard/admin/settings' },
+          { label: 'Audit Trail', icon: FileCode, path: '/dashboard/admin/audit-log' },
+        ]
       : []),
     {
       label: 'My Profile',
@@ -210,11 +241,25 @@ export function DashboardLayout({ children }) {
 
         {hasCapability('seller') && (
           <Link
-            to="/dashboard"
+            to="/dashboard/listings"
             className="flex flex-col items-center gap-1 text-[10px] text-muted"
           >
             <Car className="w-5 h-5" />
             <span>Listings</span>
+          </Link>
+        )}
+
+        {hasCapability('admin') && (
+          <Link
+            to="/dashboard/admin"
+            className={`flex flex-col items-center gap-1 text-[10px] ${
+              location.pathname.startsWith('/dashboard/admin')
+                ? 'text-text font-semibold'
+                : 'text-muted'
+            }`}
+          >
+            <ShieldCheck className="w-5 h-5" />
+            <span>Admin</span>
           </Link>
         )}
 

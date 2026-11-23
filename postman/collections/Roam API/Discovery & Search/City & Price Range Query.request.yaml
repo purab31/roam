@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{baseUrl}}/api/listings?city=Mumbai&minPrice=80000000&maxPrice=150000000"
+method: GET
+queryParams:
+  city: Mumbai
+  minPrice: "80000000"
+  maxPrice: "150000000"
+order: 4000

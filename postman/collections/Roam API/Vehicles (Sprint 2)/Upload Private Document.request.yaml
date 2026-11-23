@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/api/vehicles/{{vehicleId}}/documents"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: file
+      key: document
+      src:
+        - ""
+    - type: text
+      key: name
+      value: Registration Certificate
+order: 10000

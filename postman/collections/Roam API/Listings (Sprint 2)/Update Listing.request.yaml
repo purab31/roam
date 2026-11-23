@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{baseUrl}}/api/listings/{{listingId}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "sale": {
+        "askingPrice": 180000000,
+        "negotiable": false
+      }
+    }
+order: 5000

@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/api/listings?bodyType=SUV"
+method: GET
+queryParams:
+  bodyType: SUV
+order: 3000

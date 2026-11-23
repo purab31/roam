@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/api/vehicles/{{vehicleId}}/images"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: file
+      key: image
+      src:
+        - ""
+    - type: text
+      key: caption
+      value: Front quarter view
+order: 6000

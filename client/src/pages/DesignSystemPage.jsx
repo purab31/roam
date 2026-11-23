@@ -72,9 +72,9 @@ export function DesignSystemPage() {
     <div className="min-h-screen bg-bg text-text transition-colors duration-200">
       {/* 1. Global Announcement Bar */}
       <AnnouncementBar
-        message1="Sprint 0 Foundation Complete • Design System Showcase"
-        message2="Experience full Light & Dark mode tokens."
-        linkText="View UI Reference"
+        message1="Free vehicle history report on every listing"
+        message2="List your car free this month."
+        linkText="Become a seller"
         onLinkClick={() => {
           window.scrollTo({ top: document.getElementById('tokens-section')?.offsetTop - 80, behavior: 'smooth' });
         }}

@@ -82,6 +82,7 @@ export function AuthProvider({ children }) {
       });
     },
     onSuccess: () => {
+      localStorage.removeItem('roam_listing_wizard_draft');
       queryClient.setQueryData(['authUser'], null);
       queryClient.clear();
     },

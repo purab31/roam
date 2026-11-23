@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{baseUrl}}/api/auth/register"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "fullName": "Jane Seller",
+      "email": "seller@roam.local",
+      "mobile": "+919876543201",
+      "password": "Password123!",
+      "passwordConfirm": "Password123!",
+      "acceptTerms": true,
+      "capabilities": ["seller"]
+    }
+order: 1000

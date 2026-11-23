@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/api/vehicles/{{vehicleId}}/images/{{imageId}}/cover"
+method: PATCH
+order: 7000

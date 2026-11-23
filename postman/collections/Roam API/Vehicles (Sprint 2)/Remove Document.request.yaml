@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/api/vehicles/{{vehicleId}}/documents/{{docId}}"
+method: DELETE
+order: 12000

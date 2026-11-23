@@ -20,6 +20,9 @@ const config = {
   adminPassword: process.env.ADMIN_PASSWORD || 'Admin@Roam2026',
   adminName: process.env.ADMIN_NAME || 'Platform Administrator',
   adminMobile: process.env.ADMIN_MOBILE || '+1234567890',
+  // Settings model in DB is now the single source of truth for dealer verification; fallback to env
+  requireDealerVerification: process.env.REQUIRE_DEALER_VERIFICATION !== 'false',
+  uploadDir: process.env.UPLOAD_DIR || path.resolve(__dirname, '../../uploads'),
 };
 
 module.exports = config;

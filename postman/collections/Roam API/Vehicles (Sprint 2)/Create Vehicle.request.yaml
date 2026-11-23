@@ -1,0 +1,34 @@
+$kind: http-request
+url: "{{baseUrl}}/api/vehicles"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "brand": "Toyota",
+      "model": "Innova Crysta",
+      "variant": "2.4 ZX",
+      "bodyType": "Minivan",
+      "manufacturingYear": 2022,
+      "registrationYear": 2022,
+      "registrationNumber": "MH 02 CL 1234",
+      "fuelType": "Diesel",
+      "transmission": "Automatic",
+      "kmDriven": 35000,
+      "previousOwners": 1,
+      "condition": "Excellent",
+      "colour": "Pearl White",
+      "seatingCapacity": 7,
+      "engineOrBattery": "2.4L Diesel Engine",
+      "location": {
+        "country": "India",
+        "state": "Maharashtra",
+        "city": "Mumbai",
+        "area": "Andheri West",
+        "pincode": "400053"
+      },
+      "features": ["Leather Seats", "Sunroof", "Touchscreen"]
+    }
+order: 1000

@@ -1,0 +1,18 @@
+$kind: collection
+description: Comprehensive Postman collection for Roam pre-owned vehicle marketplace (Sprints 0-2)
+variables:
+  - key: baseUrl
+    value: http://localhost:5000
+    disabled: true
+  - key: vehicleId
+    value: ""
+    disabled: false
+  - key: listingId
+    value: ""
+    disabled: false
+  - key: imageId
+    value: ""
+    disabled: false
+  - key: docId
+    value: ""
+    disabled: false

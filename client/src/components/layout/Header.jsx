@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, Bell, User as UserIcon, LogOut, LayoutDashboard, Settings } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Menu, X, Bell, User as UserIcon, LogOut, LayoutDashboard, Settings, Tag, MessageSquare, ArrowRight, Check, Building2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { Button } from '../ui/Button';
@@ -17,9 +18,27 @@ export function Header({ activeNav }) {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [language, setLanguage] = useState('EN');
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
+  const [bellMenuOpen, setBellMenuOpen] = useState(false);
   const avatarRef = useRef(null);
+  const bellRef = useRef(null);
+
+  // Poll notifications every 30s + on window focus (Adjustment 11)
+  const { data: notifData } = useQuery({
+    queryKey: ['header-notifications'],
+    queryFn: async () => {
+      const res = await fetch('/api/notifications?limit=8', { credentials: 'include' });
+      if (!res.ok) return { items: [], unreadCount: 0 };
+      const json = await res.json();
+      return json.data || { items: [], unreadCount: 0 };
+    },
+    enabled: !!isAuthenticated,
+    refetchInterval: 30000,
+    refetchOnWindowFocus: true,
+  });
+
+  const notifications = notifData?.items || [];
+  const unreadCount = notifData?.unreadCount || 0;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,11 +49,14 @@ export function Header({ activeNav }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close avatar dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = e => {
       if (avatarRef.current && !avatarRef.current.contains(e.target)) {
         setAvatarMenuOpen(false);
+      }
+      if (bellRef.current && !bellRef.current.contains(e.target)) {
+        setBellMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -42,11 +64,10 @@ export function Header({ activeNav }) {
   }, []);
 
   const navLinks = [
-    { label: 'Buy', href: '#buy' },
-    { label: 'Rent', href: '#rent' },
-    { label: 'Sell', href: '#sell' },
-    { label: 'Dealers', href: '#dealers' },
-    { label: 'Design System', href: '/design-system' },
+    { label: 'Buy', href: '/browse?purpose=sale' },
+    { label: 'Rent', href: '/browse?purpose=rent' },
+    { label: 'Sell', href: '/listing/new' },
+    { label: 'Dealers', href: '/dealers' },
   ];
 
   return (
@@ -114,31 +135,100 @@ export function Header({ activeNav }) {
             {/* Theme Toggle */}
             <ThemeToggle />
 
-            {/* Language Switch */}
-            <button
-              type="button"
-              onClick={() => setLanguage(prev => (prev === 'EN' ? 'AR' : 'EN'))}
-              aria-label="Toggle language"
-              className="hidden sm:inline-flex text-[11px] font-medium text-muted hover:text-text px-2 py-1 rounded-full cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-text"
-            >
-              {language} / {language === 'EN' ? 'AR' : 'EN'}
-            </button>
-
             {isAuthenticated ? (
               /* Logged In Cluster (UI 7.2): Bell with Accent Dot + Avatar Circle */
               <div className="flex items-center gap-2.5">
-                {/* Notification Bell */}
-                <button
-                  type="button"
-                  aria-label="Notifications"
-                  onClick={() => navigate('/dashboard')}
-                  className="relative flex items-center justify-center w-9 h-9 rounded-full border border-border text-muted hover:text-text hover:border-text transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text"
-                >
-                  <Bell className="w-4 h-4" />
-                  <span className="absolute top-2 right-2">
-                    <Badge variant="dot" />
-                  </span>
-                </button>
+                {/* Notification Bell Dropdown (UI Section 8.9: 320px, radius 20px, grouped) */}
+                <div ref={bellRef} className="relative">
+                  <button
+                    type="button"
+                    aria-label="Notifications"
+                    aria-expanded={bellMenuOpen}
+                    onClick={() => setBellMenuOpen(prev => !prev)}
+                    className="relative flex items-center justify-center w-9 h-9 rounded-full border border-border text-muted hover:text-text hover:border-text transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text"
+                  >
+                    <Bell className="w-4 h-4" />
+                    {unreadCount > 0 && (
+                      <span className="absolute top-2 right-2">
+                        <Badge variant="dot" />
+                      </span>
+                    )}
+                  </button>
+
+                  {bellMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-80 p-3 rounded-[20px] bg-surface text-text border border-border shadow-card z-50 animate-fade-in">
+                      <div className="flex items-center justify-between pb-2 mb-2 border-b border-border">
+                        <span className="text-[13px] font-semibold text-text">Notifications</span>
+                        {unreadCount > 0 && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-accent text-accent-foreground">
+                            {unreadCount} new
+                          </span>
+                        )}
+                      </div>
+
+                      {notifications.length === 0 ? (
+                        <div className="py-6 text-center text-muted text-[12px]">
+                          No new notifications
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-1 max-h-72 overflow-y-auto">
+                          {notifications.slice(0, 5).map(n => (
+                            <div
+                              key={n._id}
+                              onClick={() => {
+                                setBellMenuOpen(false);
+                                if (n.relatedRef?.model === 'Offer') {
+                                  navigate(`/negotiations/${n.relatedRef.id}`);
+                                } else if (n.relatedRef?.model === 'Enquiry') {
+                                  navigate(`/enquiries/${n.relatedRef.id}`);
+                                } else {
+                                  navigate('/notifications');
+                                }
+                              }}
+                              className={`flex items-start gap-2.5 p-2 rounded-[14px] hover:bg-tile transition-colors cursor-pointer text-left ${
+                                !n.read ? 'bg-tile/50' : ''
+                              }`}
+                            >
+                              <div className="flex items-center justify-center w-7 h-7 rounded-full bg-tile shrink-0 mt-0.5">
+                                {n.type === 'offer' ? (
+                                  <Tag className="w-3.5 h-3.5 text-accent" />
+                                ) : n.type === 'enquiry' ? (
+                                  <MessageSquare className="w-3.5 h-3.5 text-[#2563eb]" />
+                                ) : (
+                                  <Bell className="w-3.5 h-3.5 text-muted" />
+                                )}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5">
+                                  <p className="text-[12px] font-semibold text-text truncate">
+                                    {n.title}
+                                  </p>
+                                  {!n.read && (
+                                    <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
+                                  )}
+                                </div>
+                                <p className="text-[11px] text-muted line-clamp-1">
+                                  {n.message}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="pt-2 mt-2 border-t border-border flex items-center justify-between">
+                        <Link
+                          to="/notifications"
+                          onClick={() => setBellMenuOpen(false)}
+                          className="text-[11px] font-semibold text-accent hover:underline flex items-center gap-1"
+                        >
+                          <span>View all notifications</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 {/* Avatar Menu Container */}
                 <div ref={avatarRef} className="relative">
@@ -182,6 +272,15 @@ export function Header({ activeNav }) {
                         >
                           <LayoutDashboard className="w-4 h-4" />
                           <span>Dashboard</span>
+                        </Link>
+
+                        <Link
+                          to={user?.capabilities?.includes('dealer') ? '/dealer/verification' : '/dealer/register'}
+                          onClick={() => setAvatarMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-full text-[12px] text-muted hover:text-text hover:bg-tile transition-colors"
+                        >
+                          <Building2 className="w-4 h-4" />
+                          <span>{user?.capabilities?.includes('dealer') ? 'My Dealership' : 'Register Dealership'}</span>
                         </Link>
 
                         <Link
@@ -305,6 +404,13 @@ export function Header({ activeNav }) {
                       className="text-[15px] font-medium py-1 text-text"
                     >
                       Dashboard
+                    </Link>
+                    <Link
+                      to={user?.capabilities?.includes('dealer') ? '/dealer/verification' : '/dealer/register'}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-[15px] font-medium py-1 text-muted"
+                    >
+                      {user?.capabilities?.includes('dealer') ? 'My Dealership' : 'Register Dealership'}
                     </Link>
                     <Link
                       to="/profile"

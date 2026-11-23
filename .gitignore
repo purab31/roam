@@ -32,3 +32,11 @@ lerna-debug.log*
 *.sw?
 .DS_Store
 Thumbs.db
+
+# Uploaded files (user-generated, not source)
+server/uploads/images/*.png
+server/uploads/images/*.jpg
+server/uploads/images/*.jpeg
+server/uploads/images/*.webp
+server/uploads/documents/
+!server/uploads/images/placeholders/

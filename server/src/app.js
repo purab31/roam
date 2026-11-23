@@ -16,6 +16,18 @@ const {
 const healthRoutes = require('./routes/health.routes');
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
+const vehicleRoutes = require('./routes/vehicle.routes');
+const listingRoutes = require('./routes/listing.routes');
+const enquiryRoutes = require('./routes/enquiry.routes');
+const offerRoutes = require('./routes/offer.routes');
+const transactionRoutes = require('./routes/transaction.routes');
+const notificationRoutes = require('./routes/notification.routes');
+const dealerRoutes = require('./routes/dealer.routes');
+const adminRoutes = require('./routes/admin.routes');
+const bookingRoutes = require('./routes/booking.routes');
+const reportRoutes = require('./routes/report.routes');
+const settingsRoutes = require('./routes/settings.routes');
+const path = require('path');
 
 const app = express();
 
@@ -50,10 +62,24 @@ app.use(express.urlencoded({ extended: true, limit: config.bodyLimit }));
 // Rate limiter for general API routes
 app.use('/api', apiLimiter);
 
+// Serve public uploaded images
+app.use('/uploads/images', express.static(path.join(config.uploadDir, 'images')));
+
 // Mount API routes
 app.use('/api', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/vehicles', vehicleRoutes);
+app.use('/api/listings', listingRoutes);
+app.use('/api/enquiries', enquiryRoutes);
+app.use('/api/offers', offerRoutes);
+app.use('/api/transactions', transactionRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/dealers', dealerRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Test routes for verifying error handling in non-production
 if (config.nodeEnv === 'test') {

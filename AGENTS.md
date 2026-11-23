@@ -13,6 +13,11 @@ No online payments, no real-time chat, no GPS, no AI valuation, no third-party i
 STACK
 Monorepo: /client (React 18, Vite, Tailwind wired to CSS variables, React Router, TanStack Query, React Hook Form + Zod, Lucide) and /server (Node 20, Express, Mongoose, Zod, bcrypt, JWT in httpOnly cookie, helmet, rate-limit, multer). MongoDB Atlas.
 
+- Tests use the separate database roam_test and never touch the roam dev database. Seed scripts never run inside tests.
+- Do not invent data or features that are not in the functional spec. Show only what the API returns. Hide blocks that have no real data.
+- Invalid status transitions throw ConflictError (409, code INVALID_STATUS_TRANSITION).
+- On Windows PowerShell, use npm.cmd and chain commands with ";" not "&&".
+
 ARCHITECTURE RULES
 - Server layers: routes -> controllers -> services -> models. Business rules only in services.
 - Status changes go through explicit state-machine modules (listing, offer, booking). Reject invalid transitions with typed errors.

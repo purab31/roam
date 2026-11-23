@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/api/listings?q=Honda"
+method: GET
+queryParams:
+  q: Honda
+order: 2000

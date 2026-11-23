@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{baseUrl}}/api/users/capabilities"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "capability": "dealer"
+    }
+order: 5000

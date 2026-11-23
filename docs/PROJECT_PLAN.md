@@ -157,7 +157,7 @@ The platform is built as **vertical slices**: every sprint delivers something th
 ### Sprint 10: Hardening and deployment
 
 - **Spec/UI refs**: spec 18, 22, 23; UI 11, 12, 15.
-- **Stories**: security review (spec 22.3); validation audit (18.5, 22.2); authorisation audit with a denied-user test per route; end-to-end tests for five journeys; accessibility and responsive pass; performance checks; final Postman collection; deployment; README, architecture notes, test report, known limitations.
+- **Stories**: security review (spec 22.3); validation audit (18.5, 22.2); authorisation audit with a denied-user test per route; end-to-end tests for five journeys; accessibility and responsive pass; performance checks; remove or gate /design-system for production; final Postman collection; deployment; README, architecture notes, test report, known limitations.
 - **Done when**: live URL works for all roles; UI checklist (section 15) fully ticked; a stranger can run the project from the README.
 
 ## 7. PROGRESS.md template

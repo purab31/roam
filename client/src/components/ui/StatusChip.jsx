@@ -25,9 +25,39 @@ export function StatusChip({ status, label, className = '' }) {
       icon: CheckCircle2,
       style: 'bg-[rgba(22,163,74,0.12)] text-[#16a34a] dark:text-[#34d399]',
     },
+    active: {
+      label: label || 'Active',
+      icon: CheckCircle2,
+      style: 'bg-[rgba(22,163,74,0.12)] text-[#16a34a] dark:text-[#34d399]',
+    },
     accepted: {
       label: label || 'Accepted',
       icon: Check,
+      style: 'bg-[rgba(22,163,74,0.12)] text-[#16a34a] dark:text-[#34d399]',
+    },
+    approved: {
+      label: label || 'Approved',
+      icon: CheckCircle2,
+      style: 'bg-[rgba(22,163,74,0.12)] text-[#16a34a] dark:text-[#34d399]',
+    },
+    changes_requested: {
+      label: label || 'Changes Requested',
+      icon: AlertTriangle,
+      style: 'bg-[rgba(217,119,6,0.12)] text-[#d97706] dark:text-[#fbbf24]',
+    },
+    suspended: {
+      label: label || 'Suspended',
+      icon: XCircle,
+      style: 'bg-[rgba(220,38,38,0.12)] text-[#dc2626] dark:text-[#f87171]',
+    },
+    completed: {
+      label: label || 'Completed',
+      icon: CheckCircle2,
+      style: 'bg-[rgba(22,163,74,0.12)] text-[#16a34a] dark:text-[#34d399]',
+    },
+    sold: {
+      label: label || 'Sold',
+      icon: CheckCircle2,
       style: 'bg-[rgba(22,163,74,0.12)] text-[#16a34a] dark:text-[#34d399]',
     },
     pending: {
@@ -35,10 +65,50 @@ export function StatusChip({ status, label, className = '' }) {
       icon: Clock,
       style: 'bg-[rgba(217,119,6,0.12)] text-[#d97706] dark:text-[#fbbf24]',
     },
+    submitted: {
+      label: label || 'Submitted',
+      icon: Clock,
+      style: 'bg-[rgba(217,119,6,0.12)] text-[#d97706] dark:text-[#fbbf24]',
+    },
+    counteroffer_made: {
+      label: label || 'Counteroffer',
+      icon: RotateCcw,
+      style: 'bg-[rgba(147,51,234,0.12)] text-[#9333ea] dark:text-[#c084fc]',
+    },
     negotiating: {
       label: label || 'Negotiating',
       icon: MessageSquare,
       style: 'bg-[rgba(217,119,6,0.12)] text-[#d97706] dark:text-[#fbbf24]',
+    },
+    reserved: {
+      label: label || 'Reserved',
+      icon: Clock,
+      style: 'bg-[rgba(37,99,235,0.12)] text-[#2563eb] dark:text-[#60a5fa]',
+    },
+    open: {
+      label: label || 'Open',
+      icon: MessageSquare,
+      style: 'bg-[rgba(37,99,235,0.12)] text-[#2563eb] dark:text-[#60a5fa]',
+    },
+    answered: {
+      label: label || 'Answered',
+      icon: Check,
+      style: 'bg-[rgba(147,51,234,0.12)] text-[#9333ea] dark:text-[#c084fc]',
+    },
+    resolved: {
+      label: label || 'Resolved',
+      icon: CheckCircle2,
+      style: 'bg-[rgba(22,163,74,0.12)] text-[#16a34a] dark:text-[#34d399]',
+    },
+    closed: {
+      label: label || 'Closed',
+      icon: XCircle,
+      style: 'bg-[rgba(107,114,128,0.12)] text-[#6b7280] dark:text-[#9ca3af]',
+    },
+    withdrawn: {
+      label: label || 'Withdrawn',
+      icon: XCircle,
+      style: 'bg-[rgba(107,114,128,0.12)] text-[#6b7280] dark:text-[#9ca3af]',
     },
     rejected: {
       label: label || 'Rejected',
