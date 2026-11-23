@@ -100,6 +100,13 @@ export function AdminUsersPage() {
     enabled: modalAction === 'details' && !!selectedUser,
   });
 
+  const closeModal = () => {
+    setSelectedUser(null);
+    setModalAction(null);
+    setBlockReason('');
+    setModalError('');
+  };
+
   // Block Mutation
   const blockMutation = useMutation({
     mutationFn: async ({ id, reason }) => {
@@ -155,13 +162,6 @@ export function AdminUsersPage() {
   const openActionModal = (user, action) => {
     setSelectedUser(user);
     setModalAction(action);
-    setBlockReason('');
-    setModalError('');
-  };
-
-  const closeModal = () => {
-    setSelectedUser(null);
-    setModalAction(null);
     setBlockReason('');
     setModalError('');
   };

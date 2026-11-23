@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Upload, X, Star, ArrowLeft, ArrowRight, Image as ImageIcon } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { VehicleImage } from '../vehicle/VehicleImage';
 
 /**
  * UI 8.7 Photo Uploader:
@@ -163,10 +164,11 @@ export function PhotoUploader({
                 )}
 
                 {/* Thumbnail Image */}
-                <img
+                <VehicleImage
                   src={img.url}
                   alt={img.name || `Vehicle photo ${index + 1}`}
                   className="w-full h-full object-cover"
+                  lazy={false}
                 />
 
                 {/* Cover Badge */}

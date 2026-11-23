@@ -16,6 +16,7 @@ import {
   Ban,
   Trash2,
   Plus,
+  FileText,
 } from 'lucide-react';
 import { DashboardLayout } from '../../components/dashboard/DashboardLayout';
 import { Button } from '../../components/ui/Button';
@@ -23,6 +24,7 @@ import { StatusChip } from '../../components/ui/StatusChip';
 import { Modal } from '../../components/ui/Modal';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { VehicleImage } from '../../components/vehicle/VehicleImage';
 import { useToast } from '../../context/ToastContext';
 import { formatRupees } from '../../utils/money';
 
@@ -139,6 +141,12 @@ export function RentalRequestsPage() {
   });
 
   const bookings = bookingsData?.items || [];
+
+  const closeModal = () => {
+    setSelectedBooking(null);
+    setActionType(null);
+    setRejectReason('');
+  };
 
   // Status Mutation (accept, reject, handover, complete)
   const statusMutation = useMutation({
@@ -268,12 +276,6 @@ export function RentalRequestsPage() {
   const openActionModal = (booking, type) => {
     setSelectedBooking(booking);
     setActionType(type);
-    setRejectReason('');
-  };
-
-  const closeModal = () => {
-    setSelectedBooking(null);
-    setActionType(null);
     setRejectReason('');
   };
 
@@ -436,17 +438,16 @@ export function RentalRequestsPage() {
                       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                         {/* Vehicle & Renter info */}
                         <div className="flex items-start gap-4 min-w-0">
-                          {vehicle?.images?.[0]?.url ? (
-                            <img
-                              src={vehicle.images[0].url}
+                          <div className="w-20 h-16 rounded-[14px] overflow-hidden bg-tile shrink-0 border border-border/40 flex items-center justify-center">
+                            <VehicleImage
+                              src={vehicle?.images?.[0]?.url}
                               alt=""
-                              className="w-20 h-16 rounded-[14px] object-cover bg-tile shrink-0 border border-border/40"
+                              bodyType={vehicle?.bodyType}
+                              fuelType={vehicle?.fuelType}
+                              className="w-full h-full object-cover"
+                              lazy={true}
                             />
-                          ) : (
-                            <div className="w-20 h-16 rounded-[14px] bg-tile flex items-center justify-center text-muted shrink-0">
-                              <FileText className="w-6 h-6" />
-                            </div>
-                          )}
+                          </div>
 
                           <div className="flex flex-col min-w-0">
                             <div className="flex items-center gap-2.5 flex-wrap mb-1">
@@ -565,7 +566,7 @@ export function RentalRequestsPage() {
                               </span>
                               {booking.pendingModification.reason && (
                                 <div className="text-[11px] text-muted mt-0.5">
-                                  Reason: "{booking.pendingModification.reason}"
+                                  Reason: &ldquo;{booking.pendingModification.reason}&rdquo;
                                 </div>
                               )}
                             </div>
@@ -842,7 +843,7 @@ export function RentalRequestsPage() {
 
             {selectedBooking?.pendingModification?.reason && (
               <div className="text-[12px] text-muted italic">
-                Renter Note: "{selectedBooking.pendingModification.reason}"
+                Renter Note: &ldquo;{selectedBooking.pendingModification.reason}&rdquo;
               </div>
             )}
 

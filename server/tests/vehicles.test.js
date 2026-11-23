@@ -342,6 +342,11 @@ describe('Sprint 2: Vehicle Management & Media API', () => {
       const img2 = images.find(i => (i._id || i.id) === secondImageId);
       expect(img1.isCover).toBe(false);
       expect(img2.isCover).toBe(true);
+
+      // 4. Verify Express serves the uploaded image statically with cross-origin CORP header
+      const staticRes = await request(app).get(img2.url);
+      expect(staticRes.status).toBe(200);
+      expect(staticRes.headers['cross-origin-resource-policy']).toBe('cross-origin');
     });
 
     it('should upload private document, allow owner to download, and reject other user with 403', async () => {

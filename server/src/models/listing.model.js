@@ -98,6 +98,7 @@ const listingSchema = new mongoose.Schema(
       default: () => ({}),
     },
     expiresAt: { type: Date, default: null },
+    expiryWarningSent: { type: Boolean, default: false },
     viewCount: { type: Number, default: 0, min: 0 },
     adminDeactivated: { type: Boolean, default: false },
     statusHistory: [statusHistorySchema],

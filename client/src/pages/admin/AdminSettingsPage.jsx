@@ -332,7 +332,7 @@ export function AdminSettingsPage() {
                 Vehicle Body Type Categories ({categories.length})
               </h2>
               <p className="text-[11px] text-muted mt-0.5">
-                Managed categories populate the Listing Wizard body-type select and the Home "Browse by type" tiles.
+                Managed categories populate the Listing Wizard body-type select and the Home &ldquo;Browse by type&rdquo; tiles.
               </p>
             </div>
           </div>

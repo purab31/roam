@@ -2,7 +2,7 @@ const Vehicle = require('../models/vehicle.model');
 const Listing = require('../models/listing.model');
 const notificationService = require('./notification.service');
 const { transitionModerationStatus } = require('./listingStateMachine');
-const localStorageService = require('./storage/localStorage.service');
+const storageService = require('./storage');
 const { validateImageFile, validateDocumentFile } = require('./storage/fileValidator');
 const { NotFoundError, ForbiddenError, ConflictError } = require('../errors');
 
@@ -139,11 +139,11 @@ class VehicleService {
     // Clean up uploaded files on disk
     for (const img of vehicle.images) {
       const relative = img.url.replace('/uploads/', '');
-      await localStorageService.deleteFile(relative);
+      await storageService.deleteFile(relative);
     }
     for (const doc of vehicle.documents) {
       const relative = doc.url.replace('/uploads/', '');
-      await localStorageService.deleteFile(relative);
+      await storageService.deleteFile(relative);
     }
 
     await Vehicle.findByIdAndDelete(id);
@@ -161,7 +161,7 @@ class VehicleService {
       throw new NotFoundError('Vehicle not found');
     }
 
-    const saved = await localStorageService.saveFile(file.buffer, file.originalname, 'images');
+    const saved = await storageService.saveFile(file.buffer, file.originalname, 'images');
 
     const isFirstImage = vehicle.images.length === 0;
     const newImage = {
@@ -212,7 +212,7 @@ class VehicleService {
 
     // Clean up file asynchronously
     const relative = removed.url.replace('/uploads/', '');
-    await localStorageService.deleteFile(relative);
+    await storageService.deleteFile(relative);
 
     return vehicle.toOwnerObject();
   }
@@ -292,7 +292,7 @@ class VehicleService {
       throw new NotFoundError('Vehicle not found');
     }
 
-    const saved = await localStorageService.saveFile(file.buffer, file.originalname, 'documents');
+    const saved = await storageService.saveFile(file.buffer, file.originalname, 'documents');
 
     const newDoc = {
       name: name || file.originalname,
@@ -332,7 +332,7 @@ class VehicleService {
     }
 
     const relative = doc.url.replace('/uploads/', '');
-    const fullPath = await localStorageService.getFilePath(relative);
+    const fullPath = await storageService.getFilePath(relative);
 
     return {
       filePath: fullPath,
@@ -360,7 +360,7 @@ class VehicleService {
     await vehicle.save();
 
     const relative = removed.url.replace('/uploads/', '');
-    await localStorageService.deleteFile(relative);
+    await storageService.deleteFile(relative);
 
     return vehicle.toOwnerObject();
   }

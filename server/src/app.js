@@ -3,6 +3,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const config = require('./config/env');
+const sanitizeNoSql = require('./middleware/sanitizeNoSql');
 const { apiLimiter } = require('./middleware/rateLimiter');
 const errorHandler = require('./middleware/errorHandler');
 const {
@@ -27,24 +28,41 @@ const adminRoutes = require('./routes/admin.routes');
 const bookingRoutes = require('./routes/booking.routes');
 const reportRoutes = require('./routes/report.routes');
 const settingsRoutes = require('./routes/settings.routes');
+const favouriteRoutes = require('./routes/favourite.routes');
+const recentlyViewedRoutes = require('./routes/recentlyViewed.routes');
+const compareRoutes = require('./routes/compare.routes');
+const inspectionRoutes = require('./routes/inspection.routes');
 const path = require('path');
 
 const app = express();
 
-// Security headers with Helmet
-app.use(helmet());
+// Trust reverse proxy (Vercel, Render, Railway, Cloudflare) for secure cookies & IP detection
+app.set('trust proxy', 1);
 
-// CORS with credentials
+// Security headers with Helmet - allow cross-origin resource access for images and media
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  })
+);
+
+// CORS with credentials: in production, strictly lock to config.clientOrigin
 app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-      if (
-        config.nodeEnv !== 'production' ||
-        origin === config.clientOrigin ||
-        origin.startsWith('http://localhost')
-      ) {
-        return callback(null, true);
+      if (config.nodeEnv !== 'production') {
+        if (
+          origin === config.clientOrigin ||
+          origin.startsWith('http://localhost') ||
+          origin.startsWith('http://127.0.0.1')
+        ) {
+          return callback(null, true);
+        }
+      } else {
+        if (origin === config.clientOrigin) {
+          return callback(null, true);
+        }
       }
       return callback(new Error('CORS not allowed for this origin'));
     },
@@ -59,11 +77,27 @@ app.use(cookieParser());
 app.use(express.json({ limit: config.bodyLimit }));
 app.use(express.urlencoded({ extended: true, limit: config.bodyLimit }));
 
+// In-place NoSQL injection sanitizer
+app.use(sanitizeNoSql);
+
 // Rate limiter for general API routes
 app.use('/api', apiLimiter);
 
-// Serve public uploaded images
+// Serve public uploaded images only (documents are strictly private via authenticated streaming)
 app.use('/uploads/images', express.static(path.join(config.uploadDir, 'images')));
+
+// Resolve legacy /images/cars/* image paths to appropriate body type placeholders in production
+app.use('/images/cars', (req, res) => {
+  const pathLower = (req.path || '').toLowerCase();
+  let type = 'suv';
+  if (pathLower.includes('sedan')) type = 'sedan';
+  else if (pathLower.includes('hatchback')) type = 'hatchback';
+  else if (pathLower.includes('electric') || pathLower.includes('ev')) type = 'electric';
+  else if (pathLower.includes('luxury')) type = 'luxury';
+
+  const placeholderPath = path.join(config.uploadDir, 'images', 'placeholders', `placeholder-${type}.svg`);
+  res.sendFile(placeholderPath);
+});
 
 // Mount API routes
 app.use('/api', healthRoutes);
@@ -80,6 +114,10 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/favourites', favouriteRoutes);
+app.use('/api/recently-viewed', recentlyViewedRoutes);
+app.use('/api/compare', compareRoutes);
+app.use('/api/inspections', inspectionRoutes);
 
 // Test routes for verifying error handling in non-production
 if (config.nodeEnv === 'test') {

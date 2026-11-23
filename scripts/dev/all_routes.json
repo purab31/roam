@@ -1,0 +1,1686 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/api/health",
+      "handler": "checkHealth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/register",
+      "handler": "<anonymous>"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "handler": "<anonymous>"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/logout",
+      "handler": "logout"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/forgot-password",
+      "handler": "<anonymous>"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/reset-password",
+      "handler": "<anonymous>"
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/profile",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/users/profile",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/users/password",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/users/account-status",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/users/capabilities",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/users/seller-test",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/users/create-action-test",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/vehicles",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/vehicles",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/vehicles/:id",
+      "handler": "optionalAuth"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/vehicles/:id",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/vehicles/:id",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/vehicles/:id/images",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/vehicles/:id/images/:imageId",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/vehicles/:id/images/reorder",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/vehicles/:id/images/:imageId/cover",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/vehicles/:id/documents",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/vehicles/:id/documents/:docId/download",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/vehicles/:id/documents/:docId",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/listings",
+      "handler": "<anonymous>"
+    },
+    {
+      "method": "GET",
+      "path": "/api/listings/my",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/listings/my/statistics",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/listings/:id/availability",
+      "handler": "optionalAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/listings/:id/unavailable-dates",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/listings/:id/unavailable-dates",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/listings/:id/unavailable-dates/:dateId",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/listings",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/listings/:id",
+      "handler": "optionalAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/listings/:id/statistics",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/listings/:id/renew",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/listings/:id",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/listings/:id/status",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/listings/:id",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/enquiries",
+      "handler": "requireActiveAccount"
+    },
+    {
+      "method": "GET",
+      "path": "/api/enquiries",
+      "handler": "getEnquiries"
+    },
+    {
+      "method": "GET",
+      "path": "/api/enquiries/:id",
+      "handler": "getEnquiryById"
+    },
+    {
+      "method": "POST",
+      "path": "/api/enquiries/:id/replies",
+      "handler": "requireActiveAccount"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/enquiries/:id/status",
+      "handler": "requireActiveAccount"
+    },
+    {
+      "method": "GET",
+      "path": "/api/offers/my-offers",
+      "handler": "getMyOffers"
+    },
+    {
+      "method": "GET",
+      "path": "/api/offers/received",
+      "handler": "getReceivedOffers"
+    },
+    {
+      "method": "POST",
+      "path": "/api/offers",
+      "handler": "requireActiveAccount"
+    },
+    {
+      "method": "GET",
+      "path": "/api/offers/:id",
+      "handler": "getOfferById"
+    },
+    {
+      "method": "POST",
+      "path": "/api/offers/:id/counter",
+      "handler": "requireActiveAccount"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/offers/:id/status",
+      "handler": "requireActiveAccount"
+    },
+    {
+      "method": "POST",
+      "path": "/api/transactions",
+      "handler": "requireActiveAccount"
+    },
+    {
+      "method": "POST",
+      "path": "/api/transactions/acquire",
+      "handler": "requireActiveAccount"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/transactions/:id/acquisition",
+      "handler": "requireActiveAccount"
+    },
+    {
+      "method": "GET",
+      "path": "/api/transactions/my",
+      "handler": "getMyTransactions"
+    },
+    {
+      "method": "GET",
+      "path": "/api/notifications",
+      "handler": "getMyNotifications"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/notifications/read-all",
+      "handler": "markAllRead"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/notifications/:id/read",
+      "handler": "markNotificationRead"
+    },
+    {
+      "method": "GET",
+      "path": "/api/dealers",
+      "handler": "getPublicDealers"
+    },
+    {
+      "method": "POST",
+      "path": "/api/dealers/register",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/dealers/me",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/dealers/discover-listings",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/dealers/inventory",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/dealers/inventory/bulk-status",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/dealers/dashboard-stats",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/dealers/inventory/bulk-upload",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/dealers/:id",
+      "handler": "optionalAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/dealers/:id/listings",
+      "handler": "getPublicDealerListings"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/dealers/:id",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/dealers/:id/logo",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/dealers/:id/documents",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/dealers/:id/documents/:docId/download",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/dashboard",
+      "handler": "getDashboardStats"
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/dealers",
+      "handler": "getAllDealers"
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/dealers/:id",
+      "handler": "getDealerById"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/admin/dealers/:id/verification",
+      "handler": "<anonymous>"
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/listings",
+      "handler": "getAdminListings"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/admin/listings/:id/status",
+      "handler": "<anonymous>"
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/users",
+      "handler": "getUsers"
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/users/:id",
+      "handler": "getUserById"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/admin/users/:id/block",
+      "handler": "<anonymous>"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/admin/users/:id/unblock",
+      "handler": "<anonymous>"
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/reports",
+      "handler": "getReports"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/admin/reports/:id",
+      "handler": "<anonymous>"
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/offers",
+      "handler": "getOffers"
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/bookings",
+      "handler": "getBookings"
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/settings",
+      "handler": "getSettings"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/admin/settings",
+      "handler": "<anonymous>"
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/audit-log",
+      "handler": "getAuditLogs"
+    },
+    {
+      "method": "POST",
+      "path": "/api/bookings",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bookings/summary",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bookings",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bookings/:id",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/bookings/:id/status",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/bookings/:id/modification",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "POST",
+      "path": "/api/reports",
+      "handler": "requireAuth"
+    },
+    {
+      "method": "GET",
+      "path": "/api/settings/announcement",
+      "handler": "getAnnouncement"
+    },
+    {
+      "method": "GET",
+      "path": "/api/settings/categories",
+      "handler": "getCategories"
+    },
+    {
+      "method": "GET",
+      "path": "/api/favourites",
+      "handler": "getFavourites"
+    },
+    {
+      "method": "POST",
+      "path": "/api/favourites",
+      "handler": "addFavourite"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/favourites/:id",
+      "handler": "removeFavourite"
+    },
+    {
+      "method": "POST",
+      "path": "/api/recently-viewed",
+      "handler": "recordView"
+    },
+    {
+      "method": "GET",
+      "path": "/api/recently-viewed",
+      "handler": "getRecentlyViewed"
+    },
+    {
+      "method": "GET",
+      "path": "/api/compare",
+      "handler": "compare"
+    },
+    {
+      "method": "POST",
+      "path": "/api/inspections",
+      "handler": "<anonymous>"
+    },
+    {
+      "method": "GET",
+      "path": "/api/inspections",
+      "handler": "getInspections"
+    },
+    {
+      "method": "GET",
+      "path": "/api/inspections/:id",
+      "handler": "getInspectionById"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/inspections/:id/respond",
+      "handler": "<anonymous>"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/inspections/:id/status",
+      "handler": "<anonymous>"
+    }
+  ],
+  "tests": [
+    {
+      "file": "admin.test.js",
+      "title": "should permit admin on all endpoints"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "newly submitted listing must start as pending_review (auto-approve removed)"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "admin approves listing: transitions to approved, activates sale, logs audit and notifies owner"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "admin rejects listing: transitions to rejected with reason, logs audit and notifies owner"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "admin requests corrections: sets rejected with corrections note, allowing owner to edit and resubmit"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "editing description on approved listing triggers re-review (returns to pending_review)"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "admin deactivates listing: owner cannot reactivate (403 ADMIN_DEACTIVATED)"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "re-approving a listing after re-review preserves sale.status (reserved stays reserved, sold stays sold)"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "admin blocks user with reason; existing session cookie is rejected on the very next request (403)"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "admin cannot block their own account (400 ValidationError)"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "listings of blocked users are excluded from public search"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "admin unblocks user: user can authenticate again"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "admin suspends dealer: blocks publishing and excludes listings from search"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "admin revokes dealer verification: dealer status is revoked and blocks publishing"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "authenticated user submits a valid report"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "self-reporting own listing is rejected with 400"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "duplicate open report on same subject by same user is rejected with 409"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "admin resolves report with resolution note, logging audit and notifying reporter"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "public can retrieve announcement and categories without authentication"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "admin updates settings: persists in DB, updates cache, and logs audit"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "rejects invalid linkUrl in settings update (not / or https://)"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "increments viewCount for non-owner, debounces within 1 hour, and ignores owner views"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "GET /api/admin/dashboard returns accurate totals, popular models, and 6-month sparklines"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "GET /api/admin/audit-log returns recorded mutation events in append-only order"
+    },
+    {
+      "file": "admin.test.js",
+      "title": "GET /api/admin/offers and /bookings return read-only oversight lists"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should successfully register a new user and set httpOnly auth cookie"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should reject registration with 409 when email already exists"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should reject registration with 409 when mobile already exists"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should return 400 validation error when required fields are missing or invalid"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should return 400 validation error when passwords do not match"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should authenticate user with valid credentials and return user and cookie"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should reject login with 401 when password is wrong"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should reject login with 401 when email is not found"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should clear authentication cookie"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should return 200 message and generate single-use token on forgot-password"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should reject reset-password with 400 when token is invalid or expired"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should return current user profile on GET /api/users/profile"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should reject unauthenticated request with 401 AUTH_ERROR"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should reject expired session token with 401 AUTH_ERROR"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should update profile and contact visibility on PUT /api/users/profile"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should update password on PUT /api/users/password"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should request account deactivation on PATCH /api/users/account-status"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should add seller capability on POST /api/users/capabilities"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should return 403 FORBIDDEN when user with only buyer capability hits a seller endpoint"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should allow seller endpoint when user has seller capability"
+    },
+    {
+      "file": "auth.test.js",
+      "title": "should block deactivated user from create actions with 403"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": ";"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "="
+    },
+    {
+      "file": "bookings.test.js",
+      "title": ";"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "="
+    },
+    {
+      "file": "bookings.test.js",
+      "title": ";"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "="
+    },
+    {
+      "file": "bookings.test.js",
+      "title": ";"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "="
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "renter successfully submits a valid booking request"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "rejects unauthenticated request with 401"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "blocks deactivated user with 403"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "owner cannot book their own listing (403 CANNOT_BOOK_OWN_LISTING)"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "rejects return date before or equal to pickup date (400)"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "rejects duration below minDays (min 2 days, requested 1 day) (400)"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "rejects accept for partial overlap (starts before Dec 10, ends inside: Dec 8 - Dec 12) (409 RENTAL_DATE_CONFLICT)"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "rejects accept for partial overlap (starts inside, ends after: Dec 13 - Dec 18) (409 RENTAL_DATE_CONFLICT)"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "rejects accept for contained overlap (Dec 11 - Dec 14) (409 RENTAL_DATE_CONFLICT)"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "rejects accept for containing overlap (Dec 8 - Dec 18) (409 RENTAL_DATE_CONFLICT)"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "allows accept for adjacent booking ending exactly when confirmed begins (Dec 5 - Dec 10) (Same-day turnaround)"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "allows accept for adjacent booking starting exactly when confirmed ends (Dec 15 - Dec 20)"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "owner blocks dates via UnavailableDate and conflicting booking is blocked on accept"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "pending / requested bookings do NOT block each other until confirmed"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "two concurrent accepts for overlapping dates cannot both succeed"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "owner can reject a booking request with notification to renter"
+    },
+    {
+      "file": "bookings.test.js",
+      "title": "GET /api/listings/:id/availability returns confirmed bookings and blocked dates"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": ";"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "="
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": ";"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "="
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": ";"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "="
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "progresses confirmed -> active (handed over) -> completed (returned) and creates Transaction"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "rejects skipping states: confirmed -> completed fails with 409"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "rejects double completion: second complete call fails with 409 and creates exactly 1 Transaction"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "rejects cancelling an active rental: active -> cancelled fails with 409"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "allows renter to cancel requested booking at any time without cutoff restrictions"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "allows renter to cancel confirmed booking when outside cutoff window (> 24 hours)"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "blocks renter from cancelling confirmed booking inside cutoff window (< 24 hours) with 409"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "modification_requested keeps blocking original dates, proposed dates do not block until approved"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "approves modification when clear, recalculating pricing and updating history"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "rejects modification requests after pickup date with 409"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "rejects adding blocked dates that overlap a confirmed booking with 409"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "owner can view blocked dates with notes; public endpoint omits notes"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "correctly handles booking and modification spanning IST midnight boundary (UTC offset)"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "reports recorded earnings from completed rentals only and includes real monthly sparkline series"
+    },
+    {
+      "file": "bookingsLifecycle.test.js",
+      "title": "filters bookings by view: upcoming, active, completed, cancelled"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "should register a new dealership, assign verificationStatus pending, and grant dealer capability"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "should reject duplicate dealer registration for the same user account with 409"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "should block unverified dealer from publishing a live listing with 403 DEALER_VERIFICATION_REQUIRED"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "should allow unverified dealer to save a listing as draft"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "should block unverified dealer from activating a draft listing with 403"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "should prevent forging ownerRef.type via request body"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "should reject non-admin users from admin routes with 403 Forbidden"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "should allow admin to list dealers and verify (approve) a pending dealership"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "should block suspended dealers from publishing and submitting offers"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "should return all received offers filtered by listing with dealer summary attached for dealer offers"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "should reject dealer offers from standard sale completion with 409 DEALER_ACQUISITION_REQUIRED"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "should allow dealer to initiate acquisition and confirm, transferring vehicle and closing old listing"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "should handle acquisition cancellation cleanly and restore listing availability"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "should return individual owner listings in dealer discover feed with spec 8.1 filters"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "should block dealers from editing other dealers inventory with 403 Forbidden"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "should reject bulk upload if required headers are missing with 400 ValidationError"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "in atomic mode: should reject all rows and save nothing if any row fails validation"
+    },
+    {
+      "file": "dealers.test.js",
+      "title": "in partial mode: should save valid rows and report errors for invalid rows"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": ";"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "="
+    },
+    {
+      "file": "discovery.test.js",
+      "title": ";"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "="
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should return all approved active/reserved listings with total and facet counts"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should filter by keyword q across brand, model, and description"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should safely escape regex special characters in q without throwing"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should filter by purpose (sale, rent, both)"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should filter by price range on sale asking price"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should filter price by rental.dailyPrice when purpose=rent"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should filter by vehicle attributes (brand, fuel, transmission, bodyType, condition)"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should filter by location (city, area, pincode)"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should filter by sellerType (individual vs dealer)"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should filter by manufacturing year range and km driven"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should provide disjunctive facet counts (other options remain visible when a filter is applied)"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should sort correctly by priceAsc, priceDesc, year, and lowestKm"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should reject invalid sort value with 400 ValidationError"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should cap page limit at 50"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should strip private fields (minAcceptableOffer, registrationNumber, documents) in public results"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should return empty results gracefully with total 0"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should return listing details, seller summary, and similar listings for public user"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should allow public access to reserved listings"
+    },
+    {
+      "file": "discovery.test.js",
+      "title": "should return 404 for draft, inactive, sold, or removed listings to non-owner users"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should save a listing to favourites and return 201"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should be safe on duplicate clicks (idempotency test)"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should remove a listing from favourites using listing ID only"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should return favourites with availability flags (active, reserved, sold, inactive)"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should treat listings as unavailable when owner is blocked without leaking reasons"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should treat listings as unavailable when dealer is suspended or revoked"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should treat listings as unavailable when admin deactivated, in review, or removed"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should record views atomically and retrieve up to 20 items"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should not record views of your own listings"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should filter out unavailable entries on read"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should return aligned specifications for up to 3 vehicles"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should return 400 ValidationError when comparing more than 3 vehicles"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should return only public, available listings in comparison"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should create an inspection request and notify the seller"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should reject inspection request on your own listing with 403"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should reject past appointment times with 400 ValidationError"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should prevent duplicate open inspection requests with 409"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should enforce actor-awareness: buyer cannot accept request (wrong actor gets 403)"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should allow seller to accept and notify the buyer"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should allow seller to propose a reschedule and buyer to accept it"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should send warning when approaching expiry within notice period"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should auto-deactivate expired listings through state machine"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should skip reserved listings from auto-deactivation"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should skip listings with an accepted offer from auto-deactivation"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should skip listings with confirmed or active bookings"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should allow renewal: extends expiresAt and reactivates inactive statuses"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should reject renewal with 409 if listing is active and outside the expiry notice window"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should allow renewal within notice window without stacking (resets validity from now)"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should assign expiresAt to listings without one and never expire them in the same run"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should reject renewal for non-owner with 403"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should return viewCount, favourites, enquiries, offers, bookings for owner"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should reject non-owner viewing statistics with 403"
+    },
+    {
+      "file": "engagement.test.js",
+      "title": "should provide batched statistics for My Listings in one query"
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": ";"
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": "="
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": ";"
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": "="
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": ";"
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": "="
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": ";"
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": "="
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": "should successfully submit an enquiry and notify the seller"
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": "should reject unauthenticated request with 401"
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": "should reject enquiry with 400 when missing required fields"
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": "should reject self-enquiry with 403 Forbidden (Adjustment 8)"
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": "should block deactivated accounts from submitting enquiries with 403"
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": "should return sent enquiries to the buyer and received enquiries to the seller"
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": "should allow participant to view single enquiry thread on GET /:id"
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": "should block non-participant third party from viewing thread with 403 (Adjustment 8)"
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": "should allow seller to reply, transitioning status to answered and notifying buyer"
+    },
+    {
+      "file": "enquiries.test.js",
+      "title": "should allow updating status to resolved"
+    },
+    {
+      "file": "health.test.js",
+      "title": "should return 200 with healthy status and database info in response envelope"
+    },
+    {
+      "file": "health.test.js",
+      "title": "should return 404 with NOT_FOUND error code for non-existent route"
+    },
+    {
+      "file": "health.test.js",
+      "title": "should format ValidationError with 400 and fields"
+    },
+    {
+      "file": "health.test.js",
+      "title": "should format AuthError with 401 and AUTH_ERROR code"
+    },
+    {
+      "file": "health.test.js",
+      "title": "should format ForbiddenError with 403 and FORBIDDEN_ERROR code"
+    },
+    {
+      "file": "health.test.js",
+      "title": "should format ConflictError with 409 and CONFLICT_ERROR code"
+    },
+    {
+      "file": "health.test.js",
+      "title": "should handle malformed JSON body with 400 MALFORMED_JSON"
+    },
+    {
+      "file": "listings.test.js",
+      "title": ";"
+    },
+    {
+      "file": "listings.test.js",
+      "title": "="
+    },
+    {
+      "file": "listings.test.js",
+      "title": ";"
+    },
+    {
+      "file": "listings.test.js",
+      "title": "="
+    },
+    {
+      "file": "listings.test.js",
+      "title": "should create a listing with pending_review status when submitted without saveAsDraft"
+    },
+    {
+      "file": "listings.test.js",
+      "title": "should create a draft listing when saveAsDraft is true"
+    },
+    {
+      "file": "listings.test.js",
+      "title": "should reject listing creation for a vehicle owned by another user with 403"
+    },
+    {
+      "file": "listings.test.js",
+      "title": "should reject validation when askingPrice is negative"
+    },
+    {
+      "file": "listings.test.js",
+      "title": "should reject validation when minAcceptableOffer > askingPrice"
+    },
+    {
+      "file": "listings.test.js",
+      "title": "should strip minAcceptableOffer and private vehicle fields in public GET /api/listings"
+    },
+    {
+      "file": "listings.test.js",
+      "title": "should return all owner listings including minAcceptableOffer in GET /api/listings/my"
+    },
+    {
+      "file": "listings.test.js",
+      "title": "should allow valid status transitions: active -> inactive -> active"
+    },
+    {
+      "file": "listings.test.js",
+      "title": "should allow reserving and unreserving: active -> reserved -> unreserve (active)"
+    },
+    {
+      "file": "listings.test.js",
+      "title": "should allow marking as sold and then REJECT reactivating sold with 409 ConflictError"
+    },
+    {
+      "file": "listings.test.js",
+      "title": "should return 403 when another user attempts to change status"
+    },
+    {
+      "file": "listings.test.js",
+      "title": "should soft-delete listing by setting moderationStatus to removed and logging statusHistory"
+    },
+    {
+      "file": "listings.test.js",
+      "title": "should return 403 when another user attempts to delete listing"
+    },
+    {
+      "file": "money.test.js",
+      "title": "should correctly convert whole rupees to integer paise"
+    },
+    {
+      "file": "money.test.js",
+      "title": "should handle fractional rupee amounts with rounding"
+    },
+    {
+      "file": "money.test.js",
+      "title": "should reject negative values with RangeError"
+    },
+    {
+      "file": "money.test.js",
+      "title": "should reject invalid or missing values with TypeError"
+    },
+    {
+      "file": "money.test.js",
+      "title": "should correctly convert integer paise to rupees"
+    },
+    {
+      "file": "money.test.js",
+      "title": "should reject negative paise with RangeError"
+    },
+    {
+      "file": "money.test.js",
+      "title": "should reject invalid values with TypeError"
+    },
+    {
+      "file": "money.test.js",
+      "title": "should format paise into Indian Rupee string"
+    },
+    {
+      "file": "notifications.test.js",
+      "title": ";"
+    },
+    {
+      "file": "notifications.test.js",
+      "title": "="
+    },
+    {
+      "file": "notifications.test.js",
+      "title": "should retrieve notifications with unread count on GET /api/notifications"
+    },
+    {
+      "file": "notifications.test.js",
+      "title": "should filter notifications by unreadOnly=true"
+    },
+    {
+      "file": "notifications.test.js",
+      "title": "should filter notifications by type"
+    },
+    {
+      "file": "notifications.test.js",
+      "title": "should mark single notification as read on PATCH /api/notifications/:id/read"
+    },
+    {
+      "file": "notifications.test.js",
+      "title": "should mark all notifications as read on PATCH /api/notifications/read-all"
+    },
+    {
+      "file": "offers.test.js",
+      "title": ";"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "="
+    },
+    {
+      "file": "offers.test.js",
+      "title": ";"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "="
+    },
+    {
+      "file": "offers.test.js",
+      "title": ";"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "="
+    },
+    {
+      "file": "offers.test.js",
+      "title": ";"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "="
+    },
+    {
+      "file": "offers.test.js",
+      "title": ";"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "="
+    },
+    {
+      "file": "offers.test.js",
+      "title": "should successfully submit an offer and notify the seller"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "should accept offer below minAcceptableOffer and set isBelowMinimum for seller only (Adjustment 2)"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "should reject offer on reserved listing with 409 Conflict (Spec 18.2)"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "should reject offer on sold listing with 409 Conflict (Spec 18.2)"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "should reject offer on inactive listing with 409 Conflict"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "should reject self-offer with 403 Forbidden (Adjustment 8)"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "should block deactivated accounts from offering with 403"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "should reject buyer attempting to accept or counter when awaiting seller (Adjustment 4)"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "should allow seller to counteroffer, setting awaitingResponseFrom to buyer"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "should reject seller attempting to accept/counter when awaiting buyer"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "should allow buyer to withdraw offer at any time before acceptance"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "should reject non-participant from viewing thread with 403 (Adjustment 8)"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "should accept offer in MongoDB transaction, close competing active offers, and NOT mark listing sold"
+    },
+    {
+      "file": "offers.test.js",
+      "title": "should handle concurrent accept requests so only one can succeed (Race condition test)"
+    },
+    {
+      "file": "rentalPricing.test.js",
+      "title": "calculates pure daily rate for duration < 7 days when weekly is not cheaper"
+    },
+    {
+      "file": "rentalPricing.test.js",
+      "title": "chooses full week rate when renting exactly 7 days"
+    },
+    {
+      "file": "rentalPricing.test.js",
+      "title": "chooses weekly rate if 6 days at daily (₹6,000) matches or is more expensive than 1 week (round_up_weeks)"
+    },
+    {
+      "file": "rentalPricing.test.js",
+      "title": "combines weeks and remainder days correctly (e.g. 10 days = 1 week + 3 days)"
+    },
+    {
+      "file": "rentalPricing.test.js",
+      "title": "handles listings with no weekly price (pure daily)"
+    },
+    {
+      "file": "rentalPricing.test.js",
+      "title": "throws error if return date is on or before pickup date"
+    },
+    {
+      "file": "transactions.test.js",
+      "title": ";"
+    },
+    {
+      "file": "transactions.test.js",
+      "title": "="
+    },
+    {
+      "file": "transactions.test.js",
+      "title": ";"
+    },
+    {
+      "file": "transactions.test.js",
+      "title": "="
+    },
+    {
+      "file": "transactions.test.js",
+      "title": ";"
+    },
+    {
+      "file": "transactions.test.js",
+      "title": "="
+    },
+    {
+      "file": "transactions.test.js",
+      "title": "should record completion transaction, mark listing sold, and mark offer completed"
+    },
+    {
+      "file": "transactions.test.js",
+      "title": "should reject non-seller attempt with 403 Forbidden (Adjustment 5)"
+    },
+    {
+      "file": "transactions.test.js",
+      "title": "should reject transaction when offer is not in accepted status with 409 Conflict"
+    },
+    {
+      "file": "transactions.test.js",
+      "title": "should reject double submit on same offer with 409 Conflict (Unique index check - Adjustment 5)"
+    },
+    {
+      "file": "transactions.test.js",
+      "title": "should return transaction history on GET /api/transactions/my"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": ";"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "="
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": ";"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "="
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": ";"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "="
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "should create a vehicle record when authenticated as seller"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "should reject creation with 403 when user lacks seller or dealer capability"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "should reject creation with 401 when unauthenticated"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "should reject validation when registrationYear < manufacturingYear"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "should reject validation when manufacturingYear > current year + 1"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "should reject validation when kmDriven is negative"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "should return registrationNumber and documents to the vehicle owner"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "should strip registrationNumber and documents for another user or public request"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "should allow owner to update vehicle"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "should return 403 FORBIDDEN when another user attempts to update vehicle"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "should block vehicle DELETE when it has a non-removed listing (409 Conflict)"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "should allow vehicle DELETE when vehicle has no active listings"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "should reject image upload with invalid MIME or corrupted signature"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "should upload valid image, set cover on first image, and support cover switch"
+    },
+    {
+      "file": "vehicles.test.js",
+      "title": "should upload private document, allow owner to download, and reject other user with 403"
+    }
+  ]
+}

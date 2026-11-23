@@ -21,6 +21,7 @@ import { Textarea } from '../../components/ui/Textarea';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { KebabMenu } from '../../components/ui/KebabMenu';
+import { VehicleImage } from '../../components/vehicle/VehicleImage';
 import { useToast } from '../../context/ToastContext';
 import { formatRupees } from '../../utils/money';
 
@@ -79,6 +80,13 @@ export function AdminListingsPage() {
   const total = listingsData?.total || 0;
   const totalPages = Math.ceil(total / limit) || 1;
 
+  const closeModal = () => {
+    setSelectedListing(null);
+    setModalAction(null);
+    setReasonInput('');
+    setReasonError('');
+  };
+
   // Moderation Mutation
   const moderateMutation = useMutation({
     mutationFn: async ({ id, action, reason }) => {
@@ -111,13 +119,6 @@ export function AdminListingsPage() {
   const openModal = (listing, action) => {
     setSelectedListing(listing);
     setModalAction(action);
-    setReasonInput('');
-    setReasonError('');
-  };
-
-  const closeModal = () => {
-    setSelectedListing(null);
-    setModalAction(null);
     setReasonInput('');
     setReasonError('');
   };
@@ -318,13 +319,13 @@ export function AdminListingsPage() {
                         <td className="py-3.5 pl-6 pr-3">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-tile border border-border overflow-hidden shrink-0 flex items-center justify-center p-0.5">
-                              <img
-                                src={vehicle.images?.[0]?.url || '/placeholders/sedan.svg'}
+                              <VehicleImage
+                                src={vehicle.images?.[0]?.url}
                                 alt=""
+                                bodyType={vehicle.bodyType}
+                                fuelType={vehicle.fuelType}
                                 className="w-full h-full object-contain"
-                                onError={e => {
-                                  e.currentTarget.src = '/placeholders/sedan.svg';
-                                }}
+                                lazy={true}
                               />
                             </div>
                             <div className="min-w-0">

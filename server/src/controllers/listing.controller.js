@@ -158,6 +158,45 @@ async function deleteUnavailableDate(req, res, next) {
   }
 }
 
+async function renewListing(req, res, next) {
+  try {
+    const expiryService = require('../services/expiry.service');
+    const result = await expiryService.renewListing(req.params.id, req.user);
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getListingStatistics(req, res, next) {
+  try {
+    const statsService = require('../services/listingStatistics.service');
+    const result = await statsService.getListingStatistics(req.params.id, req.user);
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getMyListingsStatistics(req, res, next) {
+  try {
+    const statsService = require('../services/listingStatistics.service');
+    const result = await statsService.getMyListingsStatistics(req.user);
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   createListing,
   getPublicListings,
@@ -170,4 +209,7 @@ module.exports = {
   getListingUnavailableDates,
   addUnavailableDate,
   deleteUnavailableDate,
+  renewListing,
+  getListingStatistics,
+  getMyListingsStatistics,
 };

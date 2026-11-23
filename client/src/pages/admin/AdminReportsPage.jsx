@@ -78,6 +78,13 @@ export function AdminReportsPage() {
   const total = reportsData?.total || 0;
   const totalPages = Math.ceil(total / limit) || 1;
 
+  const closeModal = () => {
+    setSelectedReport(null);
+    setActionStatus('');
+    setResolutionNote('');
+    setModalError('');
+  };
+
   // Resolve Mutation
   const resolveMutation = useMutation({
     mutationFn: async ({ id, status, note }) => {
@@ -111,13 +118,6 @@ export function AdminReportsPage() {
     setSelectedReport(report);
     setActionStatus(action);
     setResolutionNote(report.resolutionNote || '');
-    setModalError('');
-  };
-
-  const closeModal = () => {
-    setSelectedReport(null);
-    setActionStatus('');
-    setResolutionNote('');
     setModalError('');
   };
 

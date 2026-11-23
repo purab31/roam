@@ -92,13 +92,15 @@ async function forgotPassword({ email }) {
 
     const resetUrl = `${config.clientOrigin}/reset-password?token=${resetToken}`;
 
-    // Spec & Prompt: in development print the reset link to the console
-    console.log(`\n========================================`);
-    console.log(`[Roam Auth] Password Reset Requested for ${user.email}`);
-    console.log(`Reset Token: ${resetToken}`);
-    console.log(`Reset Link:  ${resetUrl}`);
-    console.log(`Expires in:  15 minutes`);
-    console.log(`========================================\n`);
+    // Log reset link for development/demo only when LOG_RESET_LINKS is enabled
+    if (config.logResetLinks) {
+      console.log(`\n========================================`);
+      console.log(`[Roam Auth] Password Reset Requested for ${user.email}`);
+      console.log(`Reset Token: ${resetToken}`);
+      console.log(`Reset Link:  ${resetUrl}`);
+      console.log(`Expires in:  15 minutes`);
+      console.log(`========================================\n`);
+    }
   }
 
   // Consistent generic response preventing user enumeration

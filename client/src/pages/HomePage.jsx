@@ -8,6 +8,7 @@ import { PillSearchBar } from '../components/discovery/PillSearchBar';
 import { Carousel } from '../components/discovery/Carousel';
 import { VehicleCard } from '../components/vehicle/VehicleCard';
 import { Skeleton } from '../components/ui/Skeleton';
+import { RecentlyViewedCarousel } from '../components/discovery/RecentlyViewedCarousel';
 import { Button } from '../components/ui/Button';
 import { ArrowRight, ShieldCheck, CheckCircle2, Car, Award } from 'lucide-react';
 
@@ -107,6 +108,19 @@ export function HomePage() {
       <main>
         {/* 2. Hero Band (Grey / --bg-subtle, 560px height) */}
         <section className="relative w-full bg-bg-subtle border-b border-border/40 py-16 sm:py-24 overflow-hidden">
+          {/* Background Car Silhouette Image with Reduced Opacity */}
+          <div className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center overflow-hidden">
+            <img
+              src="/images/hero-car.jpg"
+              alt=""
+              aria-hidden="true"
+              className="w-full h-full object-cover object-center opacity-15 dark:opacity-30 select-none scale-105 transition-opacity duration-300"
+            />
+            {/* Soft edge-blending vignettes to smoothly feather into --bg-subtle */}
+            <div className="absolute inset-0 bg-gradient-to-t from-bg-subtle via-transparent to-bg-subtle opacity-90" />
+            <div className="absolute inset-0 bg-gradient-to-r from-bg-subtle via-transparent to-bg-subtle opacity-80" />
+          </div>
+
           <div className="max-w-container mx-auto px-4 sm:px-8 lg:px-16 flex flex-col items-center text-center relative z-10">
             {/* Eyebrow Label */}
             <span className="text-[11px] sm:text-[12px] font-medium uppercase tracking-[0.08em] text-muted mb-4 animate-fade-in">
@@ -244,6 +258,11 @@ export function HomePage() {
             </Carousel>
           </section>
         )}
+
+        {/* Recently Viewed Carousel */}
+        <div className="max-w-container mx-auto px-4 sm:px-8 lg:px-16">
+          <RecentlyViewedCarousel />
+        </div>
 
         {/* 7. Three-Step "How it works" Row (Numbered 1-2-3 per UI 7.8) */}
         <section className="max-w-container mx-auto px-4 sm:px-8 lg:px-16 py-16 sm:py-24 border-t border-border/40">

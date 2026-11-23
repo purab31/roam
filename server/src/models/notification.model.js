@@ -10,7 +10,7 @@ const notificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['offer', 'enquiry', 'rental', 'system'],
+      enum: ['offer', 'enquiry', 'rental', 'system', 'inspection'],
       required: true,
       index: true,
     },
@@ -29,7 +29,7 @@ const notificationSchema = new mongoose.Schema(
     relatedRef: {
       model: {
         type: String,
-        enum: ['Offer', 'Enquiry', 'Listing', 'Transaction', 'Dealer', 'Booking', 'Report'],
+        enum: ['Offer', 'Enquiry', 'Listing', 'Transaction', 'Dealer', 'Booking', 'Report', 'InspectionRequest'],
       },
       id: {
         type: mongoose.Schema.Types.ObjectId,

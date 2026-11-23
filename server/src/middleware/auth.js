@@ -5,21 +5,25 @@ const Dealer = require('../models/dealer.model');
 const settingsService = require('../services/settings.service');
 const { AuthError, ForbiddenError } = require('../errors');
 
-function setAuthCookie(res, token) {
-  res.cookie(config.cookieName, token, {
+function getAuthCookieOptions() {
+  const sameSite = config.cookieSameSite || 'lax';
+  // If sameSite is 'none', browsers mandate secure: true
+  const secure = sameSite === 'none' ? true : config.nodeEnv === 'production';
+  return {
     httpOnly: true,
-    secure: config.nodeEnv === 'production',
-    sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
+    secure,
+    sameSite,
     maxAge: config.cookieMaxAge,
-  });
+  };
+}
+
+function setAuthCookie(res, token) {
+  res.cookie(config.cookieName, token, getAuthCookieOptions());
 }
 
 function clearAuthCookie(res) {
-  res.clearCookie(config.cookieName, {
-    httpOnly: true,
-    secure: config.nodeEnv === 'production',
-    sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
-  });
+  const { maxAge, ...clearOptions } = getAuthCookieOptions();
+  res.clearCookie(config.cookieName, clearOptions);
 }
 
 async function requireAuth(req, _res, next) {

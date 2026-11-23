@@ -691,15 +691,26 @@ describe('Sprint 8: Admin, Moderation, Reports & Analytics API', () => {
     test('increments viewCount for non-owner, debounces within 1 hour, and ignores owner views', async () => {
       const listingId = sampleListing._id.toString();
 
+      // Polling helper for background non-blocking view counter
+      const waitForViewCount = async (expectedCount, maxWaitMs = 1500) => {
+        const start = Date.now();
+        while (Date.now() - start < maxWaitMs) {
+          const doc = await Listing.findById(listingId);
+          if (doc && doc.viewCount === expectedCount) return doc;
+          await new Promise(r => setTimeout(r, 40));
+        }
+        return await Listing.findById(listingId);
+      };
+
       // 1. Initial count
       expect(sampleListing.viewCount || 0).toBe(0);
 
-      // 2. Buyer views listing -> viewCount becomes 1
+      // 2. Buyer views listing -> viewCount becomes 1 (non-blocking in background)
       await request(app)
         .get(`/api/listings/${listingId}`)
         .set('Cookie', makeAuthCookie(buyerToken));
 
-      const afterFirstView = await Listing.findById(listingId);
+      const afterFirstView = await waitForViewCount(1);
       expect(afterFirstView.viewCount).toBe(1);
 
       // 3. Buyer views again within 1 hour -> viewCount remains 1 (debounced)
@@ -707,6 +718,7 @@ describe('Sprint 8: Admin, Moderation, Reports & Analytics API', () => {
         .get(`/api/listings/${listingId}`)
         .set('Cookie', makeAuthCookie(buyerToken));
 
+      await new Promise(r => setTimeout(r, 100));
       const afterSecondView = await Listing.findById(listingId);
       expect(afterSecondView.viewCount).toBe(1);
 
@@ -715,6 +727,7 @@ describe('Sprint 8: Admin, Moderation, Reports & Analytics API', () => {
         .get(`/api/listings/${listingId}`)
         .set('Cookie', makeAuthCookie(sellerToken));
 
+      await new Promise(r => setTimeout(r, 100));
       const afterOwnerView = await Listing.findById(listingId);
       expect(afterOwnerView.viewCount).toBe(1);
     });

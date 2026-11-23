@@ -69,6 +69,13 @@ export function AdminDealersPage() {
     staleTime: 30 * 1000,
   });
 
+  const closeModal = () => {
+    setSelectedDealer(null);
+    setModalAction(null);
+    setActionNotes('');
+    setModalError('');
+  };
+
   // 2. Verification Mutation
   const verifyMutation = useMutation({
     mutationFn: async ({ dealerId, status, notes }) => {
@@ -102,13 +109,6 @@ export function AdminDealersPage() {
     setSelectedDealer(dealer);
     setModalAction(action);
     setActionNotes(dealer.verificationNotes || '');
-    setModalError('');
-  };
-
-  const closeModal = () => {
-    setSelectedDealer(null);
-    setModalAction(null);
-    setActionNotes('');
     setModalError('');
   };
 

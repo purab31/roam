@@ -1,18 +1,24 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './context/ToastContext';
 import { AuthProvider } from './context/AuthContext';
+import { FavouritesProvider } from './context/FavouritesContext';
+import { CompareProvider } from './context/CompareContext';
 import { ToastContainer } from './components/ui/Toast';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
+import { CompareTray } from './components/discovery/CompareTray';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { CapabilityRoute } from './components/auth/CapabilityRoute';
 
-// Pages
-import { DesignSystemPage } from './pages/DesignSystemPage';
+// Core Public & Account Pages (Eagerly Loaded)
 import { HomePage } from './pages/HomePage';
 import { BrowsePage } from './pages/BrowsePage';
 import { VehicleDetailPage } from './pages/VehicleDetailPage';
+import { FavouritesPage } from './pages/FavouritesPage';
+import { ComparePage } from './pages/ComparePage';
+import { NotFoundPage } from './pages/NotFoundPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
@@ -20,35 +26,92 @@ import { ResetPasswordPage } from './pages/auth/ResetPasswordPage';
 import { DashboardPage } from './pages/dashboard/DashboardPage';
 import { ProfilePage } from './pages/profile/ProfilePage';
 import { SettingsPage } from './pages/settings/SettingsPage';
-import { ListingWizardPage } from './pages/listing/ListingWizardPage';
 import { MyVehiclesPage } from './pages/dashboard/MyVehiclesPage';
 import { MyListingsPage } from './pages/dashboard/MyListingsPage';
-import { NegotiationThreadPage } from './pages/negotiation/NegotiationThreadPage';
 import { NotificationsPage } from './pages/notifications/NotificationsPage';
 
-// Sprint 5: Dealers
-import { DealerDirectoryPage } from './pages/dealer/DealerDirectoryPage';
-import { DealerProfilePage } from './pages/dealer/DealerProfilePage';
-import { DealerRegistrationPage } from './pages/dealer/DealerRegistrationPage';
-import { DealerVerificationStatusPage } from './pages/dealer/DealerVerificationStatusPage';
-import { DealerInventoryPage } from './pages/dashboard/dealer/DealerInventoryPage';
-import { BulkUploadPage } from './pages/dashboard/dealer/BulkUploadPage';
-import { DiscoverOwnerListingsPage } from './pages/dashboard/dealer/DiscoverOwnerListingsPage';
-import { DealerOffersSentPage } from './pages/dashboard/dealer/DealerOffersSentPage';
-import { AdminDealersPage } from './pages/admin/AdminDealersPage';
-import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
-import { AdminListingsPage } from './pages/admin/AdminListingsPage';
-import { AdminUsersPage } from './pages/admin/AdminUsersPage';
-import { AdminReportsPage } from './pages/admin/AdminReportsPage';
-import { AdminOffersPage } from './pages/admin/AdminOffersPage';
-import { AdminBookingsPage } from './pages/admin/AdminBookingsPage';
-import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
-import { AdminAuditLogPage } from './pages/admin/AdminAuditLogPage';
+// Code-Split Heavy Pages (React.lazy)
+const DesignSystemPage = React.lazy(() =>
+  import('./pages/DesignSystemPage').then(m => ({ default: m.DesignSystemPage }))
+);
+const ListingWizardPage = React.lazy(() =>
+  import('./pages/listing/ListingWizardPage').then(m => ({ default: m.ListingWizardPage }))
+);
+const NegotiationThreadPage = React.lazy(() =>
+  import('./pages/negotiation/NegotiationThreadPage').then(m => ({ default: m.NegotiationThreadPage }))
+);
+const DealerDirectoryPage = React.lazy(() =>
+  import('./pages/dealer/DealerDirectoryPage').then(m => ({ default: m.DealerDirectoryPage }))
+);
+const DealerProfilePage = React.lazy(() =>
+  import('./pages/dealer/DealerProfilePage').then(m => ({ default: m.DealerProfilePage }))
+);
+const DealerRegistrationPage = React.lazy(() =>
+  import('./pages/dealer/DealerRegistrationPage').then(m => ({ default: m.DealerRegistrationPage }))
+);
+const DealerVerificationStatusPage = React.lazy(() =>
+  import('./pages/dealer/DealerVerificationStatusPage').then(m => ({
+    default: m.DealerVerificationStatusPage,
+  }))
+);
+const DealerInventoryPage = React.lazy(() =>
+  import('./pages/dashboard/dealer/DealerInventoryPage').then(m => ({
+    default: m.DealerInventoryPage,
+  }))
+);
+const BulkUploadPage = React.lazy(() =>
+  import('./pages/dashboard/dealer/BulkUploadPage').then(m => ({ default: m.BulkUploadPage }))
+);
+const DiscoverOwnerListingsPage = React.lazy(() =>
+  import('./pages/dashboard/dealer/DiscoverOwnerListingsPage').then(m => ({
+    default: m.DiscoverOwnerListingsPage,
+  }))
+);
+const DealerOffersSentPage = React.lazy(() =>
+  import('./pages/dashboard/dealer/DealerOffersSentPage').then(m => ({
+    default: m.DealerOffersSentPage,
+  }))
+);
 
-// Sprint 6: Rentals & Bookings
-import { BookingPage } from './pages/booking/BookingPage';
-import { RentalRequestsPage } from './pages/dashboard/RentalRequestsPage';
-import { MyBookingsPage } from './pages/dashboard/MyBookingsPage';
+// Admin Pages (Code-Split)
+const AdminDealersPage = React.lazy(() =>
+  import('./pages/admin/AdminDealersPage').then(m => ({ default: m.AdminDealersPage }))
+);
+const AdminDashboardPage = React.lazy(() =>
+  import('./pages/admin/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage }))
+);
+const AdminListingsPage = React.lazy(() =>
+  import('./pages/admin/AdminListingsPage').then(m => ({ default: m.AdminListingsPage }))
+);
+const AdminUsersPage = React.lazy(() =>
+  import('./pages/admin/AdminUsersPage').then(m => ({ default: m.AdminUsersPage }))
+);
+const AdminReportsPage = React.lazy(() =>
+  import('./pages/admin/AdminReportsPage').then(m => ({ default: m.AdminReportsPage }))
+);
+const AdminOffersPage = React.lazy(() =>
+  import('./pages/admin/AdminOffersPage').then(m => ({ default: m.AdminOffersPage }))
+);
+const AdminBookingsPage = React.lazy(() =>
+  import('./pages/admin/AdminBookingsPage').then(m => ({ default: m.AdminBookingsPage }))
+);
+const AdminSettingsPage = React.lazy(() =>
+  import('./pages/admin/AdminSettingsPage').then(m => ({ default: m.AdminSettingsPage }))
+);
+const AdminAuditLogPage = React.lazy(() =>
+  import('./pages/admin/AdminAuditLogPage').then(m => ({ default: m.AdminAuditLogPage }))
+);
+
+// Sprint 6: Rentals & Bookings (Code-Split)
+const BookingPage = React.lazy(() =>
+  import('./pages/booking/BookingPage').then(m => ({ default: m.BookingPage }))
+);
+const RentalRequestsPage = React.lazy(() =>
+  import('./pages/dashboard/RentalRequestsPage').then(m => ({ default: m.RentalRequestsPage }))
+);
+const MyBookingsPage = React.lazy(() =>
+  import('./pages/dashboard/MyBookingsPage').then(m => ({ default: m.MyBookingsPage }))
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -61,16 +124,37 @@ const queryClient = new QueryClient({
 
 export function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <ToastProvider>
-          <AuthProvider>
-            <BrowserRouter>
-              <Routes>
-                {/* Public Discovery Routes (Sprint 3) */}
-                <Route path="/" element={<HomePage />} />
-                <Route path="/browse" element={<BrowsePage />} />
-                <Route path="/listings/:id" element={<VehicleDetailPage />} />
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <FavouritesProvider>
+                <CompareProvider>
+                  <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+                    <Suspense
+                      fallback={
+                        <div className="min-h-screen flex items-center justify-center bg-bg text-text">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                        </div>
+                      }
+                    >
+                      <Routes>
+                      {/* Public Discovery Routes (Sprint 3) */}
+                      <Route path="/" element={<HomePage />} />
+                      <Route path="/browse" element={<BrowsePage />} />
+                      <Route path="/listings/:id" element={<VehicleDetailPage />} />
+
+                      {/* Sprint 9: Compare (UI 8.4) & Favourites (UI 7.10) */}
+                      <Route path="/compare" element={<ComparePage />} />
+                      <Route
+                        path="/favourites"
+                        element={
+                          <ProtectedRoute>
+                            <FavouritesPage />
+                          </ProtectedRoute>
+                        }
+                      />
 
                 {/* Sprint 6: Booking Flow (UI 8.6) */}
                 <Route
@@ -361,15 +445,21 @@ export function App() {
                   }
                 />
 
-                {/* Fallback */}
-                <Route path="*" element={<Navigate to="/design-system" replace />} />
+                {/* 404 Not Found (UI 8.8) */}
+                <Route path="/404" element={<NotFoundPage />} />
+                <Route path="*" element={<NotFoundPage />} />
               </Routes>
+            </Suspense>
+            <CompareTray />
               <ToastContainer />
             </BrowserRouter>
-          </AuthProvider>
-        </ToastProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+          </CompareProvider>
+        </FavouritesProvider>
+      </AuthProvider>
+    </ToastProvider>
+  </ThemeProvider>
+</QueryClientProvider>
+</ErrorBoundary>
   );
 }
 

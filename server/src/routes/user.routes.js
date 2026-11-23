@@ -1,6 +1,7 @@
 const express = require('express');
 const userController = require('../controllers/user.controller');
 const validate = require('../middleware/validate');
+const { authLimiter } = require('../middleware/rateLimiter');
 const {
   requireAuth,
   requireCapability,
@@ -24,6 +25,7 @@ router.put(
 router.put(
   '/password',
   requireAuth,
+  authLimiter,
   validate(changePasswordSchema),
   userController.changePassword
 );

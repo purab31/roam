@@ -134,7 +134,9 @@ export function ListingWizardPage() {
       if (saved) {
         return { ...initialFormData, ...JSON.parse(saved), images: [] }; // Don't persist object URLs
       }
-    } catch {}
+    } catch (_err) {
+      // Ignore local storage error
+    }
     return initialFormData;
   });
 
@@ -146,7 +148,9 @@ export function ListingWizardPage() {
     try {
       const toSave = { ...formData, images: [] };
       localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(toSave));
-    } catch {}
+    } catch (_err) {
+      // Ignore local storage error
+    }
   }, [formData]);
 
   const handleChange = (field, value) => {

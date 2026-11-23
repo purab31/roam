@@ -99,9 +99,9 @@ const changePasswordSchema = z.object({
 });
 
 const addCapabilitySchema = z.object({
-  capability: z.enum(['buyer', 'renter', 'seller', 'dealer'], {
+  capability: z.enum(['buyer', 'renter', 'seller'], {
     errorMap: () => ({
-      message: 'Capability must be one of: buyer, renter, seller, dealer',
+      message: 'Capability must be one of: buyer, renter, seller',
     }),
   }),
 });

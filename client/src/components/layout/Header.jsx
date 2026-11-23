@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Menu, X, Bell, User as UserIcon, LogOut, LayoutDashboard, Settings, Tag, MessageSquare, ArrowRight, Check, Building2 } from 'lucide-react';
+import { Menu, X, Bell, User as UserIcon, LogOut, LayoutDashboard, Settings, Tag, MessageSquare, ArrowRight, Check, Building2, Heart } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useFavourites } from '../../context/FavouritesContext';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -14,6 +15,7 @@ import { Badge } from '../ui/Badge';
  */
 export function Header({ activeNav }) {
   const { user, isAuthenticated, logout } = useAuth();
+  const { favouriteIds } = useFavourites();
   const navigate = useNavigate();
 
   const [isScrolled, setIsScrolled] = useState(false);
@@ -136,8 +138,22 @@ export function Header({ activeNav }) {
             <ThemeToggle />
 
             {isAuthenticated ? (
-              /* Logged In Cluster (UI 7.2): Bell with Accent Dot + Avatar Circle */
+              /* Logged In Cluster (UI 7.2): Favourites Heart + Bell with Accent Dot + Avatar Circle */
               <div className="flex items-center gap-2.5">
+                {/* Saved / Favourites Icon */}
+                <Link
+                  to="/favourites"
+                  aria-label="Saved vehicles"
+                  className="relative flex items-center justify-center w-9 h-9 rounded-full border border-border text-muted hover:text-accent hover:border-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text"
+                >
+                  <Heart className={`w-4 h-4 ${favouriteIds?.size > 0 ? 'fill-accent text-accent' : ''}`} />
+                  {favouriteIds?.size > 0 && (
+                    <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full bg-accent text-accent-foreground text-[9px] font-bold">
+                      {favouriteIds.size}
+                    </span>
+                  )}
+                </Link>
+
                 {/* Notification Bell Dropdown (UI Section 8.9: 320px, radius 20px, grouped) */}
                 <div ref={bellRef} className="relative">
                   <button
@@ -275,6 +291,15 @@ export function Header({ activeNav }) {
                         </Link>
 
                         <Link
+                          to="/favourites"
+                          onClick={() => setAvatarMenuOpen(false)}
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-full text-[12px] text-muted hover:text-text hover:bg-tile transition-colors"
+                        >
+                          <Heart className="w-4 h-4" />
+                          <span>Saved Vehicles</span>
+                        </Link>
+
+                        <Link
                           to={user?.capabilities?.includes('dealer') ? '/dealer/verification' : '/dealer/register'}
                           onClick={() => setAvatarMenuOpen(false)}
                           className="flex items-center gap-2.5 px-3 py-2 rounded-full text-[12px] text-muted hover:text-text hover:bg-tile transition-colors"
@@ -319,15 +344,8 @@ export function Header({ activeNav }) {
                 </div>
               </div>
             ) : (
-              /* Logged Out Cluster: Get in touch + Sign in */
+              /* Logged Out Cluster: Sign in */
               <div className="flex items-center gap-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="hidden sm:inline-flex h-9 px-4 text-[12px]"
-                >
-                  Get in touch
-                </Button>
                 <Button
                   variant="primary"
                   size="sm"

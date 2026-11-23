@@ -1,9 +1,114 @@
 # Progress
 
 ## Current sprint
-Sprint 8: Admin, moderation, reports, and analytics. Status: complete (Backend complete, Frontend complete, 15/15 test suites passing).
+Part B2: Deployment Preparation & Documentation (Steps 8 and 9). Status: complete.
 
 ## Done
+
+### Part B2: Deployment Preparation & Documentation (Steps 8 & 9) (Complete)
+- **Same-Origin Proxy & Configurable Cookie SameSite**:
+  - Made cookie SameSite configurable via `COOKIE_SAMESITE` (`lax` for same-origin proxy, `none` + `secure: true` for cross-site fallback).
+  - Auth cookie options dynamically compute `secure` and `sameSite` policy (`server/src/middleware/auth.js`).
+  - Added `vercel.json` and `netlify.toml` configuring `/api/*` and `/uploads/images/*` proxy rewrites to Render/Railway API.
+  - Confirmed SPA client fetch calls use relative `/api/*` uniformly.
+- **Storage Abstraction & Cloudinary Provider**:
+  - Implemented `CloudinaryStorageProvider` (`server/src/services/storage/cloudinary.service.js`) implementing `StorageProvider`.
+  - Active provider dynamically selected via `STORAGE_PROVIDER=local|cloudinary` (`server/src/services/storage/index.js`).
+  - Updated `vehicle.service.js` and `dealer.service.js` to consume active storage provider.
+  - Public vehicle images and dealership logos upload to Cloudinary CDN; private legal documents remain on local disk and stream through authenticated, role-verified routes (`/api/vehicles/:id/documents/:docId/download`).
+- **Image URL Resolution in Production**:
+  - Added fallback handler for `/images/cars/*` in `server/src/app.js` serving SVG silhouette fallbacks.
+  - Updated `client/src/utils/imageUrl.js` to resolve both `/uploads/*` and `/images/cars/*`.
+  - Updated `seed.js` to map real images from `samplePhotoMappings` and fallback to valid placeholders.
+  - Copied placeholder SVG assets into `client/public/uploads/images/placeholders/`.
+- **Seed Script & Admin Hardening**:
+  - Guarded `seed.js`: Refuses `NODE_ENV=production` unless `ALLOW_DEMO_SEED=true`, and enforces explicit `SEED_PASSWORD` with no default.
+  - Hardened `seedAdmin.js`: Requires `ADMIN_PASSWORD` via environment variable in production with no default.
+  - Added `INIT_ADMIN=true` auto-creation on server startup (`server/src/server.js`) for headless cloud deploys.
+- **Expiry Cron & Sleeping Free Host Catch-Up**:
+  - Guarded `startExpiryCron()` to never schedule timers under `NODE_ENV=test`.
+  - Added an idempotent catch-up run of `checkListingExpiry()` on server startup in `server.js` so sleeping free hosts catch up missed midnight expirations upon wake.
+- **Documentation Complete**:
+  - `README.md`: Setup, scripts, monorepo layout, env variables, seeding commands.
+  - `docs/ARCHITECTURE.md`: Layers, state machines, storage architecture, polymorphic ownership, standard error envelope.
+  - `docs/DEPLOYMENT.md`: Step-by-step Atlas, Render, Vercel, Netlify guides, env variable tables per host without secrets, cold-start notice, `LOG_RESET_LINKS` documentation.
+  - `docs/TEST_REPORT.md`: Test suites summary, API integration journeys, test counts, Section 24 35-module checklist.
+  - `docs/KNOWN_LIMITATIONS.md`: npm audit highs by name (`zod`, `vite`), no CSRF tokens, in-memory rate limits, private documents on ephemeral containers, email not built, sleeping free tier.
+  - `docs/postman/Roam_Local.postman_environment.json` and `docs/postman/Roam_Hosted.postman_environment.json`: Postman local and hosted environments.
+
+### Sprint 9: Favourites, Compare, Recently Viewed, Inspections, Expiry, Statistics & Polish (Complete)
+- **Centralized Listing Availability Guard (`server/src/services/listingAvailability.service.js`)**:
+  - `isListingAvailable(listing)` evaluates listings for public engagement features (favourites, compare, recently viewed, inspections).
+  - Flags listing as unavailable if:
+    - `moderationStatus` is not `'approved'`, or `adminDeactivated` is true, or `moderationStatus` is `'removed'`.
+    - Owner account is `'blocked'`.
+    - Dealer profile is `'suspended'` or `'revoked'`.
+    - Sale or rental statuses are not publicly visible (e.g., `'inactive'`).
+  - Never leaks private seller reasons; returns a uniform availability flag (`active`, `reserved`, `sold`, `inactive`, `unavailable`).
+- **Favourites System (`server/src/models/favourite.model.js`, `server/src/services/favourites.service.js`, `server/src/routes/favourite.routes.js`)**:
+  - `POST /api/favourites`: Adds a listing to user favourites. Compound unique index `{ user: 1, listing: 1 }` prevents duplicates; double-clicks return existing record safely.
+  - `DELETE /api/favourites/:id`: Removes a listing from user favourites by listing ID.
+  - `GET /api/favourites`: Retrieves user favourites populated with vehicle and listing status, along with `availability` flag so the frontend can display unavailable vehicles without breaking.
+- **Recently Viewed System (`server/src/models/recentlyViewed.model.js`, `server/src/services/recentlyViewed.service.js`, `server/src/routes/recentlyViewed.routes.js`)**:
+  - Atomic update (`POST /api/recently-viewed`): Pulls any existing entry for the listing, pushes a new entry with `viewedAt: Date.now()`, and slices the array to the last 20 items.
+  - Owner exclusion: Users viewing their own listings are never recorded.
+  - `GET /api/recently-viewed`: Filters out unavailable listings on read and returns up to 20 recent items.
+- **Compare System (`server/src/services/compare.service.js`, `server/src/routes/compare.routes.js`)**:
+  - `GET /api/compare?ids=a,b,c`: Compares up to 3 listings. Rejects queries with > 3 IDs with 400 `INVALID_COMPARISON_LIMIT`.
+  - Filters out unavailable or non-public listings.
+  - Returns vehicle cards alongside aligned specification rows (price, purpose, year, km driven, fuel, transmission, body type, seats, ownership, city, state) and computes `hasDifference` flags for visual accent difference dots.
+- **Inspection Appointments System (`server/src/models/inspectionRequest.model.js`, `server/src/services/inspectionStateMachine.js`, `server/src/services/inspection.service.js`, `server/src/routes/inspection.routes.js`)**:
+  - Scope: Coordinates in-person appointments only; does not evaluate or verify mechanical condition.
+  - State Machine: `requested` -> `accepted` | `rejected` | `reschedule_proposed` | `cancelled`; `reschedule_proposed` -> `accepted` | `rejected` | `cancelled`; `accepted` -> `completed` | `cancelled`.
+  - Actor-aware enforcement: Rejects invalid transitions or wrong actors with 403 `FORBIDDEN_ACTION` / 409 `INVALID_STATUS_TRANSITION`.
+  - Validation: Requires `preferredDateTime` and proposed reschedule times to be in the future.
+  - Duplicate guard: Prevents duplicate open inspection requests per user per listing.
+  - Self-inspection guard: Prevents users from requesting inspections on their own listings.
+  - Post-commit in-app notifications dispatched for all lifecycle changes (requested, accepted, rejected, reschedule proposed, completed, cancelled).
+  - Endpoints: `POST /api/inspections`, `GET /api/inspections`, `GET /api/inspections/:id`, `PATCH /api/inspections/:id/respond`, `PATCH /api/inspections/:id/status`.
+- **Listing Expiry & Renewal (`server/src/services/expiry.service.js`, `server/src/services/settings.service.js`, `server/src/routes/listing.routes.js`)**:
+  - Expiry notice period: 7 days before expiry (`listingExpiryNoticeDays = 7`).
+  - Clock-injectable and idempotent expiry check logic (`checkListingExpiry`).
+  - Active exclusion rules: Skips listings that are `reserved`, listings with an `accepted` offer, and listings with `confirmed` or `active` rental bookings.
+  - Non-public exclusion rules: Skips listings in `draft`, `pending_review`, `rejected`, `removed`, or with `adminDeactivated: true`.
+  - Notification dispatch: Dispatches warning notification when within 7 days of expiry and sets `expiryWarningSent: true`.
+  - Status transition: Sets expired listings to `inactive` through the listing state machine.
+  - Scheduled cron: `node-cron` scheduled at server start (`0 0 * * *`) executing `checkListingExpiry()`.
+  - Renewal endpoint (`POST /api/listings/:id/renew`): Owner or dealer can renew an active or expired listing. If active, extends from `expiresAt`; if already expired, extends from `now`. Resets `expiryWarningSent: false` and restores `active` status if deactivated by expiry.
+- **Listing Statistics (`server/src/services/listingStatistics.service.js`, `server/src/routes/listing.routes.js`)**:
+  - `GET /api/listings/:id/statistics`: Single listing statistics for owners/dealers. Non-owners are rejected with 403 `FORBIDDEN_ERROR`. Aggregates views (from permanent `viewCount`), saved count (from `Favourite`), total enquiries, total offers, and total bookings.
+  - `GET /api/listings/my/statistics`: Batched statistics for all user listings in a single performant aggregation query for My Listings dashboard.
+- **Vehicle Image Architecture & Display System Fix**:
+  - Root cause resolved: Express static file serving configured with `Cross-Origin-Resource-Policy: cross-origin` in Helmet and `/uploads` static file mount; client URL resolution handles cross-origin API hosts (`VITE_API_BASE_URL`); relative paths and broken placeholder references resolved.
+  - Shared `VehicleImage` component (`client/src/components/vehicle/VehicleImage.jsx`) created and integrated across all vehicle surfaces (VehicleCard, detail hero gallery, favourites, compare, compare tray, recently viewed carousel, dashboards, My Listings, My Vehicles, My Bookings, Rental Requests, Admin listings, Admin dashboard).
+  - Built-in automatic fallback to neutral SVG silhouette drawings (`/placeholders/placeholder-${bodyType}.svg`) on image load errors or missing photos.
+  - Image URL resolution helper (`client/src/utils/imageUrl.js`) ensuring resilient URL resolution across development and production environments.
+  - Database seed updated idempotently to associate structured car photo paths (`/images/cars/<bodyType>/car-N.jpg`) while preserving seller-uploaded vehicle photos.
+- **Frontend Favourites, Compare & Discovery UI**:
+  - `FavouritesContext.jsx` & `CompareContext.jsx`: Global context providers for optimistic favourites state and persistent comparison tray with 3-item limit.
+  - `CompareTray.jsx`: UI 8.2 docked pill at bottom of viewport displaying up to 3 vehicle thumbnails with remove buttons and a primary Compare action button.
+  - `ComparePage.jsx`: UI 8.4 comparison matrix with sticky header, vehicle tiles, aligned dotted-leader spec rows across columns, and visual accent dots for differing specs.
+  - `FavouritesPage.jsx`: UI 7.10 saved vehicle page gracefully handling sold, inactive, or unavailable vehicles without breaking.
+  - `RecentlyViewedCarousel.jsx`: Reusable recently viewed carousel integrated on `VehicleDetailPage.jsx` and `HomePage.jsx`.
+  - `VehicleCard.jsx`: Real favourites heart button with optimistic active fill and hover compare trigger.
+  - `Header.jsx`: Heart icon with saved count badge in header right cluster, and "Saved Vehicles" link in avatar dropdown.
+- **Frontend Inspection Modals & Queues**:
+  - `InspectionModal.jsx`: Booking modal for buyers with date and time pickers (validated for future dates), message input, and character counters.
+  - `InspectionAppointmentsList.jsx`: Integrated in `DashboardPage.jsx` for both buyers and sellers, supporting status tabs, counter-reschedule proposal modals, and status actions (accept, decline, complete, cancel).
+- **Frontend Listing Expiry & Dashboard Stat Counters**:
+  - `MyListingsPage.jsx`: Batched statistics indicators (views, saved count, enquiries, offers, bookings) on listing cards, expiry warning banners with days-to-expiry notice, expired banners, and "Renew" mutation action.
+- **Application Polish, Resilience & Static Analysis**:
+  - `NotFoundPage.jsx`: UI 8.8-compliant 404 page utilizing `EmptyState` with compass icon and return-to-home action.
+  - `ErrorBoundary.jsx`: React component error boundary catching unexpected interface crashes with reload recovery.
+  - `App.jsx`: Wrapped with `ErrorBoundary`, `FavouritesProvider`, `CompareProvider`, compare tray, and routes for `/favourites`, `/compare`, `/404`, and fallback `*`.
+  - Reduced-motion accessibility supported throughout components and styling.
+  - ESLint configuration updated in client and server enforcing `no-use-before-define`, `react-hooks/rules-of-hooks`, and `react-hooks/exhaustive-deps`. Verified 0 errors across client and server.
+  - Client Page Smoke Testing (`client/scripts/smoke-test.mjs` via `npm run test:smoke`): Verified that Home, Browse, Vehicle Detail, Favourites, and Compare pages mount and render with their provider stacks, routers, and query caches without errors.
+- **Automated Integration Testing (100% Green, 246/246 Tests Passing Across 16 Test Suites)**:
+  - `server/tests/engagement.test.js`: 30 new tests covering favourites, recently viewed, compare (including >3 rejection), inspections (full lifecycle, actor permissions, future date checks, duplicate prevention), listing expiry exclusions & renewals, and listing statistics security.
+  - Verified full test suite: 246 tests passed across 16 test suites.
+- **Postman API Collection (`docs/postman/Roam.postman_collection.json`)**:
+  - Added "Sprint 9: Engagement & Polish" folder with 12 configured requests.
 
 ### Sprint 8: Admin, Moderation, Reports, and Analytics (Complete)
 - **Frontend Admin Dashboard & Operations (`client/src/pages/admin/` & `client/src/components/dashboard/DashboardLayout.jsx`)**:
@@ -470,14 +575,64 @@ Sprint 8: Admin, moderation, reports, and analytics. Status: complete (Backend c
   - Updated `docs/postman/Roam.postman_collection.json` with 8 new Sprint 7 requests.
 
 ### Deferred
-- Admin and platform trust workflows, moderation queues, audit logs (Sprint 8).
-- Engagement features (favourites, compare tray, inspection appointments) (Sprint 9).
-- Deployment and hardening audits (Sprint 10).
+- Deployment, environment configuration audits, security checklist, and production hardening (Sprint 10).
 
 ### Decisions made
 - State Machine Integrity: Spec 10.4 and 10.5 strictly define that rentals conclude via return/completion after handover. Therefore, `active -> cancelled` and `confirmed -> completed` (skipping handover) are disallowed and return typed 409 errors.
 - Real Sparklines Only: Per prompt rules, stat card sparklines are rendered strictly using real 6-month aggregated completion data from `GET /api/bookings/summary` without fabricated data points.
 - Partial Filter Unique Indexes: Configured `{ offerRef: 1 }` and `{ bookingRef: 1 }` with `{ partialFilterExpression: { $exists: true } }` on `Transaction` so sale and rental transactions coexist cleanly.
+- Uniform Availability Flag: For privacy protection, favourites, compare, recently viewed, and inspections return a generic `'unavailable'` status when a listing's owner is blocked, dealer is suspended/revoked, or listing is deactivated by admin or removed, without exposing internal administrative status.
+- Listing Expiry Notice Period & Assumptions: Spec section 17.2 (lines 1104-1109) specifies:
+  > "- Store listing creation and expiry dates.\n- Notify owners when a listing is approaching expiry.\n- Mark expired listings as inactive or pending renewal.\n- Allow owners to renew eligible listings."
+  Because the functional specification does not specify an exact number of days for "approaching expiry", the notice period is defined as named constant `DEFAULT_LISTING_EXPIRY_NOTICE_DAYS = 7` and recorded as an explicit project assumption.
+- Renewal Eligibility & No Stacking: Renewal is strictly restricted to listings that are within the 7-day expiry notice window or already expired/inactive. Attempting to renew earlier returns 409 `NOT_ELIGIBLE_FOR_RENEWAL`. Stacking is removed: renewal resets validity from `now` (`now + expiryDays`), preventing cumulative or unlimited date extensions.
+- Existing Listings Safe Initialization: When the expiry cron encounters an approved listing without `expiresAt`, it assigns standard validity from `now` (`now + expiryDays`) and immediately skips deactivation/warning in that run, ensuring the first scheduled run cannot mass-deactivate existing listings.
+- Non-Blocking View Counting: Per high-throughput marketplace design, `recordListingView` in `getListingById` executes asynchronously in the background without awaiting, guaranteeing that database delays or duplicate keys never affect or fail the vehicle detail response envelope. Integration tests verify view counts using active polling.
+- Optional Email Specification Verification: Spec section 13.3 (lines 1004-1005) explicitly states:
+  > "Notifications may be displayed within the website. Email notifications are optional. A real-time chat system is not required."
+  The platform utilizes in-app notifications for all events, keeping the stack free from third-party email services per the project scope limits.
+- Inspection State Machine Actor Guards: Transitions strictly enforce actor identity (buyer vs seller vs admin). Any wrong-actor attempt throws a 403 `FORBIDDEN_ACTION`. Duplicate open inspection requests per user per listing are blocked with 409 `DUPLICATE_INSPECTION_REQUEST`.
+
+---
+
+## Sprint 10 (Part B1): Hardening, QA & Security Verification - Completed
+
+### What is done
+- **Step 0: Verification & Route Coverage**:
+  - Programmatically audited 108 routes across 18 route modules (16 public, 64 authenticated/capability, 11 ownership-checked, 17 admin-protected).
+  - Cleaned up throwaway audit scripts by moving to `scripts/dev/`.
+  - Audited critical boundaries: user self-elevation via profile/capability blocked, `ownerRef` and `moderationStatus` never accepted from client bodies, private fields stripped on public reads.
+- **Security Hardening (Fixes 1-10)**:
+  - **Fix 1: Static Route Quarantine**: Removed unrestricted root `/uploads` static mount in `server/src/app.js`. Mounted strictly `/uploads/images` with cross-origin CORP. Unauthenticated requests to `/uploads/documents/*` return 404, while authenticated owner streaming routes continue to stream to owners.
+  - **Fix 2: Proxy Trust & CORS Lockdown**: Added `app.set('trust proxy', 1)` to support reverse proxies and secure cookie propagation. Locked production CORS exclusively to `config.clientOrigin`.
+  - **Fix 3: Rate Limiting Fortification**: Applied strict `authLimiter` (20 requests / 15m) to sensitive routes (`/register`, `/reset-password`, `/password`). Elevated global limiter to 300 requests / 15m for shared institutional environments.
+  - **Fix 4: NoSQL Injection Sanitation**: Built and mounted in-place recursive key-sanitizing middleware (`sanitizeNoSql.js`) that strips any object keys starting with `$` or containing `.` from `req.body`, `req.query`, and `req.params`. Verified blocking with `{"email": {"$gt": ""}}`.
+  - **Fix 5: XSS Protection**: Confirmed zero instances of `dangerouslySetInnerHTML` in client application code. Enforced string trimming and length bounds on user-generated content.
+  - **Fix 6: Password Reset Link Logging**: Guarded sensitive password reset tokens behind `LOG_RESET_LINKS=true` (`config.logResetLinks`).
+  - **Fix 7: Production Error Masking**: Masked internal server 500 error messages to generic `"An internal server error occurred"` in production environments to avoid leaking database internals.
+  - **Fix 8: Production Startup Safeguards**: Enforced hard process termination at startup if `JWT_SECRET` or `MONGODB_URI` are missing or default in production mode.
+  - **Fix 9: Input Validation Fortification**: Restricted `addCapabilitySchema` to `['buyer', 'renter', 'seller']`. Enforced `.max(120)` on vehicle `features` items.
+  - **Fix 10: Negative Authorization Test Suite (`server/tests/securityAuthorization.test.js`)**: Added 18 table-driven tests covering static access controls, private document downloads, cross-user ownership updates, blocked user access, deactivated user limits, and capability elevation.
+- **End-to-End Integration Journeys (`server/tests/e2eJourneys.test.js`)**:
+  - Built comprehensive multi-step integration journey suite running against isolated `roam_e2e` database across 5 core workflows (20/20 tests passed):
+    1. Owner sells to Buyer (offer -> counter -> accept -> transaction complete).
+    2. Owner sells to Dealer (dealer discovery -> acquisition offer -> acceptance -> confirmation).
+    3. Renter books and Owner accepts (overlap rejection with 409 `RENTAL_DATE_CONFLICT`).
+    4. Admin moderation (dealer document verification + listing approval).
+    5. Dealer bulk inventory upload (CSV parsing, atomic validation, inventory verification).
+- **Client Bundle & Performance Optimization**:
+  - Implemented dynamic code-splitting via `React.lazy` and `Suspense` in `client/src/App.jsx` for all heavy administrative, dealer dashboard, and wizard routes.
+  - Main bundle size reduced from 734 kB to 468.60 kB (123.77 kB gzip), eliminating chunk size warnings.
+  - Gated development `/design-system` route strictly out of production builds (`import.meta.env.DEV`).
+  - Opted into React Router v7 future flags (`v7_startTransition: true`, `v7_relativeSplatPath: true`).
+  - Ran clean client and server linting (0 errors).
+  - Verified client smoke tests across Home, Browse, Detail, Favourites, Compare, and VehicleImage fallback components.
+- **Test Suite Results**:
+  - All 18 test suites passed cleanly: 287 passed, 287 total.
+
+### Deferred
+- Deployment steps 8 & 9 (Docker multi-stage builds, production compose, CI/CD pipelines, production deployment runbook) deferred to Part B2 in a separate session.
+
 
 
 ### Sprint 3 - Stage 0: Cleanups and Baseline
@@ -667,12 +822,62 @@ Sprint 8: Admin, moderation, reports, and analytics. Status: complete (Backend c
   - Updated `docs/postman/Roam.postman_collection.json` with 8 new Sprint 7 requests.
 
 ### Deferred
-- Admin and platform trust workflows, moderation queues, audit logs (Sprint 8).
-- Engagement features (favourites, compare tray, inspection appointments) (Sprint 9).
-- Deployment and hardening audits (Sprint 10).
+- Deployment, environment configuration audits, security checklist, and production hardening (Sprint 10).
 
 ### Decisions made
 - State Machine Integrity: Spec 10.4 and 10.5 strictly define that rentals conclude via return/completion after handover. Therefore, `active -> cancelled` and `confirmed -> completed` (skipping handover) are disallowed and return typed 409 errors.
 - Real Sparklines Only: Per prompt rules, stat card sparklines are rendered strictly using real 6-month aggregated completion data from `GET /api/bookings/summary` without fabricated data points.
 - Partial Filter Unique Indexes: Configured `{ offerRef: 1 }` and `{ bookingRef: 1 }` with `{ partialFilterExpression: { $exists: true } }` on `Transaction` so sale and rental transactions coexist cleanly.
+- Uniform Availability Flag: For privacy protection, favourites, compare, recently viewed, and inspections return a generic `'unavailable'` status when a listing's owner is blocked, dealer is suspended/revoked, or listing is deactivated by admin or removed, without exposing internal administrative status.
+- Listing Expiry Notice Period & Assumptions: Spec section 17.2 (lines 1104-1109) specifies:
+  > "- Store listing creation and expiry dates.\n- Notify owners when a listing is approaching expiry.\n- Mark expired listings as inactive or pending renewal.\n- Allow owners to renew eligible listings."
+  Because the functional specification does not specify an exact number of days for "approaching expiry", the notice period is defined as named constant `DEFAULT_LISTING_EXPIRY_NOTICE_DAYS = 7` and recorded as an explicit project assumption.
+- Renewal Eligibility & No Stacking: Renewal is strictly restricted to listings that are within the 7-day expiry notice window or already expired/inactive. Attempting to renew earlier returns 409 `NOT_ELIGIBLE_FOR_RENEWAL`. Stacking is removed: renewal resets validity from `now` (`now + expiryDays`), preventing cumulative or unlimited date extensions.
+- Existing Listings Safe Initialization: When the expiry cron encounters an approved listing without `expiresAt`, it assigns standard validity from `now` (`now + expiryDays`) and immediately skips deactivation/warning in that run, ensuring the first scheduled run cannot mass-deactivate existing listings.
+- Non-Blocking View Counting: Per high-throughput marketplace design, `recordListingView` in `getListingById` executes asynchronously in the background without awaiting, guaranteeing that database delays or duplicate keys never affect or fail the vehicle detail response envelope. Integration tests verify view counts using active polling.
+- Optional Email Specification Verification: Spec section 13.3 (lines 1004-1005) explicitly states:
+  > "Notifications may be displayed within the website. Email notifications are optional. A real-time chat system is not required."
+  The platform utilizes in-app notifications for all events, keeping the stack free from third-party email services per the project scope limits.
+- Inspection State Machine Actor Guards: Transitions strictly enforce actor identity (buyer vs seller vs admin). Any wrong-actor attempt throws a 403 `FORBIDDEN_ACTION`. Duplicate open inspection requests per user per listing are blocked with 409 `DUPLICATE_INSPECTION_REQUEST`.
+
+---
+
+## Sprint 10 (Part B1): Hardening, QA & Security Verification - Completed
+
+### What is done
+- **Step 0: Verification & Route Coverage**:
+  - Programmatically audited 108 routes across 18 route modules (16 public, 64 authenticated/capability, 11 ownership-checked, 17 admin-protected).
+  - Cleaned up throwaway audit scripts by moving to `scripts/dev/`.
+  - Audited critical boundaries: user self-elevation via profile/capability blocked, `ownerRef` and `moderationStatus` never accepted from client bodies, private fields stripped on public reads.
+- **Security Hardening (Fixes 1-10)**:
+  - **Fix 1: Static Route Quarantine**: Removed unrestricted root `/uploads` static mount in `server/src/app.js`. Mounted strictly `/uploads/images` with cross-origin CORP. Unauthenticated requests to `/uploads/documents/*` return 404, while authenticated owner streaming routes continue to stream to owners.
+  - **Fix 2: Proxy Trust & CORS Lockdown**: Added `app.set('trust proxy', 1)` to support reverse proxies and secure cookie propagation. Locked production CORS exclusively to `config.clientOrigin`.
+  - **Fix 3: Rate Limiting Fortification**: Applied strict `authLimiter` (20 requests / 15m) to sensitive routes (`/register`, `/reset-password`, `/password`). Elevated global limiter to 300 requests / 15m for shared institutional environments.
+  - **Fix 4: NoSQL Injection Sanitation**: Built and mounted in-place recursive key-sanitizing middleware (`sanitizeNoSql.js`) that strips any object keys starting with `$` or containing `.` from `req.body`, `req.query`, and `req.params`. Verified blocking with `{"email": {"$gt": ""}}`.
+  - **Fix 5: XSS Protection**: Confirmed zero instances of `dangerouslySetInnerHTML` in client application code. Enforced string trimming and length bounds on user-generated content.
+  - **Fix 6: Password Reset Link Logging**: Guarded sensitive password reset tokens behind `LOG_RESET_LINKS=true` (`config.logResetLinks`).
+  - **Fix 7: Production Error Masking**: Masked internal server 500 error messages to generic `"An internal server error occurred"` in production environments to avoid leaking database internals.
+  - **Fix 8: Production Startup Safeguards**: Enforced hard process termination at startup if `JWT_SECRET` or `MONGODB_URI` are missing or default in production mode.
+  - **Fix 9: Input Validation Fortification**: Restricted `addCapabilitySchema` to `['buyer', 'renter', 'seller']`. Enforced `.max(120)` on vehicle `features` items.
+  - **Fix 10: Negative Authorization Test Suite (`server/tests/securityAuthorization.test.js`)**: Added 18 table-driven tests covering static access controls, private document downloads, cross-user ownership updates, blocked user access, deactivated user limits, and capability elevation.
+- **End-to-End Integration Journeys (`server/tests/e2eJourneys.test.js`)**:
+  - Built comprehensive multi-step integration journey suite running against isolated `roam_e2e` database across 5 core workflows (20/20 tests passed):
+    1. Owner sells to Buyer (offer -> counter -> accept -> transaction complete).
+    2. Owner sells to Dealer (dealer discovery -> acquisition offer -> acceptance -> confirmation).
+    3. Renter books and Owner accepts (overlap rejection with 409 `RENTAL_DATE_CONFLICT`).
+    4. Admin moderation (dealer document verification + listing approval).
+    5. Dealer bulk inventory upload (CSV parsing, atomic validation, inventory verification).
+- **Client Bundle & Performance Optimization**:
+  - Implemented dynamic code-splitting via `React.lazy` and `Suspense` in `client/src/App.jsx` for all heavy administrative, dealer dashboard, and wizard routes.
+  - Main bundle size reduced from 734 kB to 468.60 kB (123.77 kB gzip), eliminating chunk size warnings.
+  - Gated development `/design-system` route strictly out of production builds (`import.meta.env.DEV`).
+  - Opted into React Router v7 future flags (`v7_startTransition: true`, `v7_relativeSplatPath: true`).
+  - Ran clean client and server linting (0 errors).
+  - Verified client smoke tests across Home, Browse, Detail, Favourites, Compare, and VehicleImage fallback components.
+- **Test Suite Results**:
+  - All 18 test suites passed cleanly: 287 passed, 287 total.
+
+### Deferred
+- Deployment steps 8 & 9 (Docker multi-stage builds, production compose, CI/CD pipelines, production deployment runbook) deferred to Part B2 in a separate session.
+
 

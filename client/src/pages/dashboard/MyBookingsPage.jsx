@@ -19,6 +19,7 @@ import { StatusChip } from '../../components/ui/StatusChip';
 import { Modal } from '../../components/ui/Modal';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { VehicleImage } from '../../components/vehicle/VehicleImage';
 import { useToast } from '../../context/ToastContext';
 import { formatRupees } from '../../utils/money';
 
@@ -86,6 +87,13 @@ export function MyBookingsPage() {
     },
   });
 
+  const closeModifyModal = () => {
+    setModifyingBooking(null);
+    setNewStartDate('');
+    setNewEndDate('');
+    setModificationReason('');
+  };
+
   // Submit Modification Request Mutation
   const modifyMutation = useMutation({
     mutationFn: async ({ bookingId, startDate, endDate, reason }) => {
@@ -121,13 +129,6 @@ export function MyBookingsPage() {
     setModifyingBooking(booking);
     setNewStartDate(new Date(booking.startDate).toISOString().slice(0, 16));
     setNewEndDate(new Date(booking.endDate).toISOString().slice(0, 16));
-    setModificationReason('');
-  };
-
-  const closeModifyModal = () => {
-    setModifyingBooking(null);
-    setNewStartDate('');
-    setNewEndDate('');
     setModificationReason('');
   };
 
@@ -228,17 +229,16 @@ export function MyBookingsPage() {
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     {/* Left: Vehicle and Booking details */}
                     <div className="flex items-start gap-4 min-w-0">
-                      {vehicle?.images?.[0]?.url ? (
-                        <img
-                          src={vehicle.images[0].url}
+                      <div className="w-20 h-16 rounded-[14px] overflow-hidden bg-tile shrink-0 border border-border/40 flex items-center justify-center">
+                        <VehicleImage
+                          src={vehicle?.images?.[0]?.url}
                           alt=""
-                          className="w-20 h-16 rounded-[14px] object-cover bg-tile shrink-0 border border-border/40"
+                          bodyType={vehicle?.bodyType}
+                          fuelType={vehicle?.fuelType}
+                          className="w-full h-full object-cover"
+                          lazy={true}
                         />
-                      ) : (
-                        <div className="w-20 h-16 rounded-[14px] bg-tile flex items-center justify-center text-muted shrink-0">
-                          <FileText className="w-6 h-6" />
-                        </div>
-                      )}
+                      </div>
 
                       <div className="flex flex-col min-w-0">
                         <div className="flex items-center gap-2.5 flex-wrap mb-1">

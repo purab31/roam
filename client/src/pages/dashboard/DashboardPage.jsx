@@ -25,6 +25,8 @@ import { useToast } from '../../context/ToastContext';
 import { StatusChip } from '../../components/ui/StatusChip';
 import { Button } from '../../components/ui/Button';
 import { Skeleton } from '../../components/ui/Skeleton';
+import { InspectionAppointmentsList } from '../../components/inspection/InspectionAppointmentsList';
+import { VehicleImage } from '../../components/vehicle/VehicleImage';
 import { formatRupees, rupeesToPaise } from '../../utils/money';
 
 export function DashboardPage() {
@@ -375,13 +377,13 @@ export function DashboardPage() {
                     >
                       <div className="flex items-start gap-3.5 min-w-0">
                         <div className="w-12 h-12 rounded-[14px] bg-surface border border-border overflow-hidden shrink-0 flex items-center justify-center p-1">
-                          <img
-                            src={vehicle.images?.[0]?.url || '/placeholders/sedan.svg'}
+                          <VehicleImage
+                            src={vehicle.images?.[0]?.url}
                             alt=""
+                            bodyType={vehicle.bodyType}
+                            fuelType={vehicle.fuelType}
                             className="w-full h-full object-contain"
-                            onError={e => {
-                              e.currentTarget.src = '/placeholders/sedan.svg';
-                            }}
+                            lazy={false}
                           />
                         </div>
 
@@ -502,6 +504,13 @@ export function DashboardPage() {
                 })}
               </div>
             )}
+          </div>
+        )}
+
+        {/* SPRINT 9: SELLER INSPECTION APPOINTMENTS */}
+        {isSeller && (
+          <div className="p-6 sm:p-8 rounded-[24px] bg-surface border border-border shadow-card">
+            <InspectionAppointmentsList role="seller" />
           </div>
         )}
 
@@ -783,6 +792,11 @@ export function DashboardPage() {
             )}
           </div>
         )}
+
+        {/* SPRINT 9: BUYER INSPECTION APPOINTMENTS */}
+        <div className="p-6 sm:p-8 rounded-[24px] bg-surface border border-border shadow-card">
+          <InspectionAppointmentsList role="buyer" />
+        </div>
 
         {/* Upgrade to Seller Card (if not seller) */}
         {!isSeller && (

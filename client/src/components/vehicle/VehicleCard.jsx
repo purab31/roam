@@ -1,7 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, ShieldCheck, Car } from 'lucide-react';
+import { Heart, Scale, Car } from 'lucide-react';
 import { formatRupees } from '../../utils/money';
+import { useFavourites } from '../../context/FavouritesContext';
+import { useCompare } from '../../context/CompareContext';
+import { VehicleImage } from './VehicleImage';
 
 /**
  * UI 7.10 Vehicle Card (Carousel Tile & Grid Card)
@@ -63,11 +66,17 @@ export function VehicleCard({
   const metadataLine = metadataParts.join(' · ');
 
   const navigate = useNavigate();
+  const { isFavourited, toggleFavourite } = useFavourites();
+  const { isInCompare, addToCompare } = useCompare();
+
+  const targetId = listing?.id || listing?._id || vehicle?.id || vehicle?._id;
+  const favourited = isFavourited(targetId);
+  const compared = isInCompare(targetId);
+
   const handleClick = e => {
     if (onClick) {
       onClick(e);
     } else {
-      const targetId = listing?.id || listing?._id || vehicle?.id || vehicle?._id;
       if (targetId) {
         navigate(`/listings/${targetId}`);
       }
@@ -104,33 +113,54 @@ export function VehicleCard({
           )}
         </div>
 
-        {/* Top-Right Heart Wishlist Button */}
-        <button
-          type="button"
-          onClick={e => {
-            e.stopPropagation();
-          }}
-          className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-surface/90 backdrop-blur-sm border border-border/50 flex items-center justify-center text-muted hover:text-danger hover:scale-110 opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-sm"
-          title="Save vehicle"
-          aria-label="Save vehicle"
-        >
-          <Heart className="w-4 h-4" />
-        </button>
+        {/* Top-Right Action Buttons: Compare + Heart */}
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={e => {
+              e.stopPropagation();
+              addToCompare({
+                id: targetId,
+                title: fullName,
+                price: priceDisplay,
+                coverImage,
+              });
+            }}
+            className={`w-8 h-8 rounded-full bg-surface/90 backdrop-blur-sm border border-border/50 flex items-center justify-center transition-all duration-200 shadow-sm ${
+              compared
+                ? 'opacity-100 text-accent border-accent/40 bg-accent/10'
+                : 'opacity-0 group-hover:opacity-100 text-muted hover:text-text hover:scale-110'
+            }`}
+            title={compared ? 'In comparison tray' : 'Add to compare'}
+            aria-label="Compare vehicle"
+          >
+            <Scale className="w-3.5 h-3.5" />
+          </button>
 
-        {/* Vehicle Image or Cut-out with 1.04 Hover Scale */}
-        {coverImage ? (
-          <img
-            src={coverImage}
-            alt={fullName}
-            className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
-            loading="lazy"
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center text-muted/60 transition-transform duration-300 group-hover:scale-105">
-            <Car className="w-16 h-16 stroke-[1.2]" />
-            <span className="text-[11px] mt-2 font-light">No image uploaded</span>
-          </div>
-        )}
+          <button
+            type="button"
+            onClick={e => toggleFavourite(targetId, e)}
+            className={`w-8 h-8 rounded-full bg-surface/90 backdrop-blur-sm border border-border/50 flex items-center justify-center transition-all duration-200 shadow-sm ${
+              favourited
+                ? 'opacity-100 text-accent fill-accent'
+                : 'opacity-0 group-hover:opacity-100 text-muted hover:text-accent hover:scale-110'
+            }`}
+            title={favourited ? 'Saved to favourites' : 'Save vehicle'}
+            aria-label="Save vehicle"
+          >
+            <Heart className={`w-4 h-4 ${favourited ? 'fill-accent text-accent' : ''}`} />
+          </button>
+        </div>
+
+        {/* Vehicle Image with 1.04 Hover Scale */}
+        <VehicleImage
+          src={coverImage}
+          alt={fullName}
+          bodyType={vehicle.bodyType}
+          fuelType={vehicle.fuelType}
+          className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+          lazy={true}
+        />
       </div>
 
       {/* Below Tile: Name, Price, and Metadata (8px inset) */}

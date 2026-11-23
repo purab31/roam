@@ -65,7 +65,10 @@ const vehicleBaseSchema = z.object({
     pincode: z.string().min(1, 'Pincode is required').trim(),
     pickupLocation: z.string().trim().optional(),
   }),
-  features: z.array(z.string().trim()).optional().default([]),
+  features: z
+    .array(z.string().trim().max(120, 'Feature description cannot exceed 120 characters'))
+    .optional()
+    .default([]),
   knownDefects: z.string().trim().optional(),
   serviceHistory: z.string().trim().optional(),
   accidentHistory: z.string().trim().optional(),

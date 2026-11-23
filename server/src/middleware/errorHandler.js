@@ -35,6 +35,11 @@ function errorHandler(err, req, res, _next) {
     console.error(`[Server Error] ${err.stack || err.message}`);
   }
 
+  // Spec 22.3: In production, mask unhandled 500 internal errors to prevent exposing database or driver details
+  if (statusCode >= 500 && process.env.NODE_ENV === 'production') {
+    message = 'An internal server error occurred';
+  }
+
   const response = {
     success: false,
     error: {

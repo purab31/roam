@@ -248,7 +248,7 @@ export function DealerVerificationStatusPage() {
                     Compliance Officer Notes:
                   </p>
                   <p className="text-[13px] leading-relaxed">
-                    "{dealer.verificationNotes}"
+                    &ldquo;{dealer.verificationNotes}&rdquo;
                   </p>
                 </div>
               )}

@@ -5,10 +5,26 @@ const Vehicle = require('../src/models/vehicle.model');
 const Listing = require('../src/models/listing.model');
 const config = require('../src/config/env');
 
-// Safety guard: development only, never run in test or production
-if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test') {
-  console.error('[Seed Error] Seed script is restricted to development environment only.');
+// Safety guard: test is forbidden; production requires ALLOW_DEMO_SEED=true and SEED_PASSWORD
+if (process.env.NODE_ENV === 'test') {
+  console.error('[Seed Error] Seed script is restricted and must never run in test environment.');
   process.exit(1);
+}
+
+if (process.env.NODE_ENV === 'production' && process.env.ALLOW_DEMO_SEED !== 'true') {
+  console.error('[Seed Error] Seeding in production requires ALLOW_DEMO_SEED=true.');
+  process.exit(1);
+}
+
+let seedPassword = process.env.SEED_PASSWORD;
+if (process.env.NODE_ENV === 'production' && !seedPassword) {
+  console.error(
+    '[Seed Error] In production, SEED_PASSWORD environment variable must be explicitly provided with no default.'
+  );
+  process.exit(1);
+}
+if (!seedPassword) {
+  seedPassword = 'Password@123';
 }
 
 const sampleSellers = [
@@ -993,13 +1009,32 @@ const vehicleDataset = [
   },
 ];
 
+const samplePhotoMappings = {
+  'Volkswagen-Virtus': '/uploads/images/01_Volkswagen_Virtus.jpg',
+  'Skoda-Slavia': '/uploads/images/02_Skoda_Slavia.jpg',
+  'Honda-Amaze': '/uploads/images/03_Honda_Amaze.jpg',
+  'Toyota-Camry': '/uploads/images/04_Toyota_Camry.jpg',
+  'Honda-City': '/uploads/images/05_Honda_City.jpg',
+  'Maruti Suzuki-Ciaz': '/uploads/images/06_Maruti_Suzuki_Ciaz.jpg',
+  'Tata-Tiago EV': '/uploads/images/07_Tata_Tiago_EV.jpg',
+  'Tata-Nexon EV': '/uploads/images/08_Tata_Nexon_EV.jpg',
+  'Tata-Altroz': '/uploads/images/09_Tata_Altroz.jpg',
+  'Tata-Punch': '/uploads/images/10_Tata_Punch.jpg',
+  'Audi-A4': '/uploads/images/11_Audi_A4.jpg',
+  'Mercedes-Benz-GLA': '/uploads/images/12_Mercedes_Benz_GLA.jpg',
+  'BMW-5 Series': '/uploads/images/13_BMW_5_Series.jpg',
+  'Toyota-Innova Crysta': '/uploads/images/14_Toyota_Innova_Crysta.jpg',
+  'Mercedes-Benz-E-Class': '/uploads/images/15_Mercedes_Benz_E_Class.jpg',
+  'Tata-Safari': '/uploads/images/16_Tata_Safari.jpg',
+};
+
 async function seedDatabase() {
   console.log('[Seed] Connecting to MongoDB...');
   await connectDB();
 
   try {
     const salt = await bcrypt.genSalt(10);
-    const defaultPasswordHash = await bcrypt.hash('Password@123', salt);
+    const defaultPasswordHash = await bcrypt.hash(seedPassword, salt);
 
     console.log('[Seed] Seeding sample sellers...');
     const createdUsers = [];
@@ -1037,8 +1072,32 @@ async function seedDatabase() {
       const assignedSeller = createdUsers[i % createdUsers.length];
       const isDealer = assignedSeller.capabilities.includes('dealer');
 
+      const bodyTypeKey = (vData.bodyType || 'suv').toLowerCase();
+      const photoKey = `${vData.brand}-${vData.model}`;
+      const carPhotoUrl =
+        samplePhotoMappings[photoKey] ||
+        vData.placeholder ||
+        `/uploads/images/placeholders/placeholder-${bodyTypeKey}.svg`;
+
       // 1. Upsert Vehicle by unique registrationNumber
       let vehicle = await Vehicle.findOne({ registrationNumber: vData.reg });
+
+      // Preserve user-uploaded photos if already present on this vehicle
+      const existingUserPhotos = vehicle?.images?.filter(
+        img => img.url?.startsWith('/uploads/images/') && !img.url?.includes('placeholder')
+      );
+      const vehicleImages =
+        existingUserPhotos && existingUserPhotos.length > 0
+          ? existingUserPhotos
+          : [
+              {
+                url: carPhotoUrl,
+                isCover: true,
+                order: 0,
+                caption: `${vData.brand} ${vData.model} - Exterior Profile`,
+              },
+            ];
+
       const vehiclePayload = {
         brand: vData.brand,
         model: vData.model,
@@ -1068,14 +1127,7 @@ async function seedDatabase() {
         accidentHistory: 'Clean title. No structural or major accidents reported.',
         insuranceInfo: 'Comprehensive insurance valid for current year.',
         pollutionCertInfo: 'Valid PUC certified.',
-        images: [
-          {
-            url: vData.placeholder,
-            isCover: true,
-            order: 0,
-            caption: `${vData.brand} ${vData.model} - Exterior Profile`,
-          },
-        ],
+        images: vehicleImages,
         ownerRef: {
           type: isDealer ? 'dealer' : 'user',
           id: assignedSeller._id,
@@ -1158,7 +1210,7 @@ async function seedDatabase() {
 
     console.log(`[Seed Complete] Successfully processed ${vehicleDataset.length} listings!`);
     console.log(`Created: ${createdCount} listings, Updated: ${updatedCount} listings.`);
-    console.log(`Log in as any seed seller with password: Password@123`);
+    console.log(`Log in as any seed seller with password: ${seedPassword}`);
   } catch (err) {
     console.error('[Seed Error] Failed to seed marketplace:', err);
   } finally {

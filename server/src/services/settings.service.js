@@ -88,6 +88,14 @@ class SettingsService {
     const settings = await this.getSettings();
     return !!settings.dealerVerificationRequired;
   }
+
+  /**
+   * Helper checking current listing expiry days.
+   */
+  async getListingExpiryDays() {
+    const settings = await this.getSettings();
+    return settings.listingExpiryDays || 90;
+  }
 }
 
 module.exports = new SettingsService();

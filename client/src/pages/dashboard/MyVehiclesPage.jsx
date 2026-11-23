@@ -6,6 +6,7 @@ import { DashboardLayout } from '../../components/dashboard/DashboardLayout';
 import { Button } from '../../components/ui/Button';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { VehicleImage } from '../../components/vehicle/VehicleImage';
 
 export function MyVehiclesPage() {
   const navigate = useNavigate();
@@ -109,18 +110,14 @@ export function MyVehiclesPage() {
                 >
                   {/* Photo / Tile Area */}
                   <div className="relative w-full h-48 bg-tile flex items-center justify-center overflow-hidden">
-                    {coverImg ? (
-                      <img
-                        src={coverImg}
-                        alt={`${v.brand} ${v.model}`}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center text-muted/60">
-                        <Car className="w-12 h-12 stroke-[1.2]" />
-                        <span className="text-[11px] mt-1 font-light">No image</span>
-                      </div>
-                    )}
+                    <VehicleImage
+                      src={coverImg}
+                      alt={`${v.brand} ${v.model}`}
+                      bodyType={v.bodyType}
+                      fuelType={v.fuelType}
+                      className="w-full h-full object-cover"
+                      lazy={true}
+                    />
                     <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-surface/90 text-text backdrop-blur-sm border border-border/40">
                       {v.bodyType}
                     </span>

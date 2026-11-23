@@ -8,7 +8,7 @@ const Offer = require('../models/offer.model');
 const Enquiry = require('../models/enquiry.model');
 const notificationService = require('./notification.service');
 const auditLogService = require('./auditLog.service');
-const localStorageService = require('./storage/localStorage.service');
+const storageService = require('./storage');
 const { validateImageFile, validateDocumentFile } = require('./storage/fileValidator');
 const config = require('../config/env');
 const {
@@ -199,7 +199,7 @@ class DealerService {
       throw new ForbiddenError('You can only update your own dealership');
     }
 
-    const saved = await localStorageService.saveFile(file.buffer, file.originalname, 'images');
+    const saved = await storageService.saveFile(file.buffer, file.originalname, 'images');
     dealer.logo = saved.url;
     await dealer.save();
     return dealer.toOwnerObject();
@@ -226,7 +226,7 @@ class DealerService {
       throw new ForbiddenError('You can only upload documents to your own dealership');
     }
 
-    const saved = await localStorageService.saveFile(file.buffer, file.originalname, 'documents');
+    const saved = await storageService.saveFile(file.buffer, file.originalname, 'documents');
 
     dealer.documents.push({
       name: file.originalname || 'Verification Document',
@@ -262,7 +262,7 @@ class DealerService {
     }
 
     const relativePath = doc.url.replace('/uploads/', '');
-    const fullPath = await localStorageService.getFilePath(relativePath);
+    const fullPath = await storageService.getFilePath(relativePath);
 
     return {
       filePath: fullPath,

@@ -11,7 +11,12 @@ const {
 
 const router = express.Router();
 
-router.post('/register', validate(registerSchema), authController.register);
+router.post(
+  '/register',
+  authLimiter,
+  validate(registerSchema),
+  authController.register
+);
 router.post('/login', authLimiter, validate(loginSchema), authController.login);
 router.post('/logout', authController.logout);
 router.post(
@@ -22,6 +27,7 @@ router.post(
 );
 router.post(
   '/reset-password',
+  authLimiter,
   validate(resetPasswordSchema),
   authController.resetPassword
 );

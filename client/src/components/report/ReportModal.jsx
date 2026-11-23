@@ -35,6 +35,13 @@ export function ReportModal({
   const [description, setDescription] = useState('');
   const [error, setError] = useState('');
 
+  const handleClose = () => {
+    setCategory('misleading');
+    setDescription('');
+    setError('');
+    onClose();
+  };
+
   const reportMutation = useMutation({
     mutationFn: async payload => {
       const res = await fetch('/api/reports', {
@@ -61,13 +68,6 @@ export function ReportModal({
       setError(err.message || 'Failed to submit report. Please try again.');
     },
   });
-
-  const handleClose = () => {
-    setCategory('misleading');
-    setDescription('');
-    setError('');
-    onClose();
-  };
 
   const handleSubmit = e => {
     e.preventDefault();

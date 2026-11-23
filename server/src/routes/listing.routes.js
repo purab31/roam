@@ -18,6 +18,7 @@ router.get('/', validate(getPublicListingsQuerySchema, 'query'), listingControll
 
 // CRITICAL (Rule 10): Declare GET /api/listings/my BEFORE /:id
 router.get('/my', requireAuth, listingController.getMyListings);
+router.get('/my/statistics', requireAuth, requireActiveAccount, listingController.getMyListingsStatistics);
 
 // Get listing availability (public calendar query)
 router.get('/:id/availability', optionalAuth, listingController.getAvailability);
@@ -59,6 +60,12 @@ router.post(
 
 // Get single listing by ID
 router.get('/:id', optionalAuth, listingController.getListingById);
+
+// Listing statistics
+router.get('/:id/statistics', requireAuth, requireActiveAccount, listingController.getListingStatistics);
+
+// Renew listing
+router.post('/:id/renew', requireAuth, requireActiveAccount, listingController.renewListing);
 
 // Update listing details
 router.put(

@@ -2487,6 +2487,334 @@
           }
         }
       ]
+    },
+    {
+      "name": "Sprint 9: Engagement & Polish",
+      "item": [
+        {
+          "name": "Favourites",
+          "item": [
+            {
+              "name": "Add Favourite",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"listingId\": \"{{listingId}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/favourites",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "favourites"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Favourites",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/favourites",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "favourites"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Remove Favourite",
+              "request": {
+                "method": "DELETE",
+                "url": {
+                  "raw": "{{baseUrl}}/api/favourites/{{listingId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "favourites",
+                    "{{listingId}}"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recently Viewed",
+          "item": [
+            {
+              "name": "Record Recently Viewed",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"listingId\": \"{{listingId}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/recently-viewed",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "recently-viewed"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Recently Viewed",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/recently-viewed",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "recently-viewed"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Compare",
+          "item": [
+            {
+              "name": "Compare Listings (up to 3)",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/compare?ids={{listingId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "compare"
+                  ],
+                  "query": [
+                    {
+                      "key": "ids",
+                      "value": "{{listingId}}"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Inspections",
+          "item": [
+            {
+              "name": "Create Inspection Request",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"listingId\": \"{{listingId}}\",\n  \"preferredDateTime\": \"2026-12-01T10:00:00.000Z\",\n  \"message\": \"Can I inspect the car tomorrow?\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/inspections",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "inspections"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "List Inspection Requests",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/inspections?role=all",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "inspections"
+                  ],
+                  "query": [
+                    {
+                      "key": "role",
+                      "value": "all"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Inspection Request Details",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/inspections/{{inspectionId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "inspections",
+                    "{{inspectionId}}"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Seller Respond to Inspection",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"accept\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/inspections/{{inspectionId}}/respond",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "inspections",
+                    "{{inspectionId}}",
+                    "respond"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update Inspection Status",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"completed\",\n  \"reason\": \"Inspection successfully completed\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/inspections/{{inspectionId}}/status",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "inspections",
+                    "{{inspectionId}}",
+                    "status"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Expiry & Statistics",
+          "item": [
+            {
+              "name": "Renew Listing",
+              "request": {
+                "method": "POST",
+                "url": {
+                  "raw": "{{baseUrl}}/api/listings/{{listingId}}/renew",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "listings",
+                    "{{listingId}}",
+                    "renew"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Listing Statistics (Owner/Dealer)",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/listings/{{listingId}}/statistics",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "listings",
+                    "{{listingId}}",
+                    "statistics"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Batched Statistics for My Listings",
+              "request": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/api/listings/my/statistics",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "listings",
+                    "my",
+                    "statistics"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "variable": [

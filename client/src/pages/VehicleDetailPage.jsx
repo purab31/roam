@@ -8,6 +8,7 @@ import { Footer } from '../components/layout/Footer';
 import { DottedSpecRow } from '../components/discovery/DottedSpecRow';
 import { Carousel } from '../components/discovery/Carousel';
 import { VehicleCard } from '../components/vehicle/VehicleCard';
+import { VehicleImage } from '../components/vehicle/VehicleImage';
 import { Skeleton } from '../components/ui/Skeleton';
 import { Button } from '../components/ui/Button';
 import { OfferSideSheet } from '../components/offer/OfferSideSheet';
@@ -15,10 +16,15 @@ import { EnquiryModal } from '../components/enquiry/EnquiryModal';
 import { DateRangePicker } from '../components/rental/DateRangePicker';
 import { RentalTermsTab } from '../components/rental/RentalTermsTab';
 import { ReportModal } from '../components/report/ReportModal';
+import { InspectionModal } from '../components/inspection/InspectionModal';
+import { RecentlyViewedCarousel } from '../components/discovery/RecentlyViewedCarousel';
+import { useFavourites } from '../context/FavouritesContext';
+import { useCompare } from '../context/CompareContext';
 import { formatRupees } from '../utils/money';
 import {
   ChevronRight,
   Heart,
+  Scale,
   ShieldCheck,
   CheckCircle2,
   FileCheck,
@@ -60,18 +66,42 @@ export function VehicleDetailPage() {
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('specifications');
-  const [isSaved, setIsSaved] = useState(false);
   const [isOfferSheetOpen, setIsOfferSheetOpen] = useState(false);
   const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isInspectionModalOpen, setIsInspectionModalOpen] = useState(false);
   const [activeMode, setActiveMode] = useState('buy'); // 'buy' | 'rent'
   const [rentalDateRange, setRentalDateRange] = useState({ start: '', end: '' });
 
-  const { data: listing, isLoading, isError, error } = useQuery({
+  const { isFavourited, toggleFavourite } = useFavourites();
+  const { isInCompare, addToCompare } = useCompare();
+
+  const { data: listing, isLoading, isError, error: _error } = useQuery({
     queryKey: ['listing-detail', id],
     queryFn: () => fetchListingDetail(id),
     retry: 1,
   });
+
+  const isOwner =
+    isAuthenticated &&
+    user &&
+    listing &&
+    listing.ownerRef &&
+    (listing.ownerRef.id === user.id ||
+      listing.ownerRef.id === user._id ||
+      (user.dealerId && listing.ownerRef.id === user.dealerId));
+
+  // Record recently viewed view
+  React.useEffect(() => {
+    if (listing && isAuthenticated && !isOwner) {
+      const targetListingId = listing._id || listing.id || id;
+      fetch('/api/recently-viewed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ listingId: targetListingId }),
+      }).catch(() => {});
+    }
+  }, [listing, id, isAuthenticated, isOwner]);
 
   // Sync initial mode with listing purpose
   React.useEffect(() => {
@@ -121,26 +151,18 @@ export function VehicleDetailPage() {
   const seller = listing.seller;
   const similarListings = listing.similarListings || [];
 
-  const isOwner =
-    isAuthenticated &&
-    user &&
-    listing.ownerRef &&
-    (listing.ownerRef.id === user.id ||
-      listing.ownerRef.id === user._id ||
-      (user.dealerId && listing.ownerRef.id === user.dealerId));
-
   const isReserved = listing.sale?.status === 'reserved';
   const isRent = listing.purpose === 'rent';
   const hasRental = listing.purpose === 'rent' || listing.purpose === 'both';
 
-  const images = vehicle.images?.length > 0
-    ? vehicle.images
-    : [{ url: '/uploads/images/placeholders/placeholder-suv.svg', isCover: true, caption: 'Default vehicle' }];
-
-  const currentImage = images[activeImageIndex] || images[0];
-
   // Title formatting: e.g. "2021 Honda City ZX"
   const fullTitle = `${vehicle.manufacturingYear || ''} ${vehicle.brand || ''} ${vehicle.model || ''} ${vehicle.variant || ''}`.trim();
+
+  const images = vehicle.images?.length > 0
+    ? vehicle.images
+    : [{ url: null, isCover: true, caption: fullTitle }];
+
+  const currentImage = images[activeImageIndex] || images[0];
 
   // Price formatting
   const priceDisplay = listing.sale?.askingPrice
@@ -251,10 +273,13 @@ export function VehicleDetailPage() {
                           isActive ? 'opacity-100 ring-1 ring-text' : 'opacity-60 hover:opacity-90'
                         }`}
                       >
-                        <img
+                        <VehicleImage
                           src={img.url}
                           alt=""
+                          bodyType={vehicle.bodyType}
+                          fuelType={vehicle.fuelType}
                           className="w-full h-full object-cover"
+                          lazy={false}
                         />
                       </button>
                     </div>
@@ -264,10 +289,13 @@ export function VehicleDetailPage() {
 
               {/* Main Image Display */}
               <div className="relative w-full h-[320px] sm:h-[480px] rounded-[24px] bg-tile overflow-hidden flex items-center justify-center p-4 border border-border/40 shadow-xs">
-                <img
-                  src={currentImage.url}
+                <VehicleImage
+                  src={currentImage?.url}
                   alt={fullTitle}
+                  bodyType={vehicle.bodyType}
+                  fuelType={vehicle.fuelType}
                   className="w-full h-full object-cover rounded-[16px] transition-transform duration-300"
+                  lazy={false}
                 />
 
                 {/* Status Badge Top-Left if Reserved */}
@@ -399,26 +427,82 @@ export function VehicleDetailPage() {
                       >
                         Make an offer
                       </Button>
+
+                      {/* Add to Compare */}
                       <button
                         type="button"
-                        onClick={() => setIsSaved(prev => !prev)}
-                        aria-label="Save to wishlist"
-                        className={`flex items-center justify-center w-11 h-11 rounded-full border border-border text-muted hover:text-danger hover:border-danger transition-colors cursor-pointer shrink-0 ${
-                          isSaved ? 'text-danger border-danger fill-danger' : ''
+                        onClick={() =>
+                          addToCompare({
+                            id: listing?._id || listing?.id || id,
+                            title: fullTitle,
+                            price: priceDisplay,
+                            coverImage: currentImage?.url || vehicle?.images?.[0]?.url,
+                          })
+                        }
+                        aria-label="Compare vehicle"
+                        className={`flex items-center justify-center w-11 h-11 rounded-full border border-border text-muted hover:text-text hover:border-text transition-colors cursor-pointer shrink-0 ${
+                          isInCompare(listing?._id || listing?.id || id)
+                            ? 'text-accent border-accent/60 bg-accent/10'
+                            : ''
                         }`}
+                        title={
+                          isInCompare(listing?._id || listing?.id || id)
+                            ? 'In comparison tray'
+                            : 'Add to compare'
+                        }
                       >
-                        <Heart className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
+                        <Scale className="w-4 h-4" />
+                      </button>
+
+                      {/* Favourites Heart Button */}
+                      <button
+                        type="button"
+                        onClick={e => toggleFavourite(listing?._id || listing?.id || id, e)}
+                        aria-label="Save to favourites"
+                        className={`flex items-center justify-center w-11 h-11 rounded-full border border-border text-muted hover:text-accent hover:border-accent transition-colors cursor-pointer shrink-0 ${
+                          isFavourited(listing?._id || listing?.id || id)
+                            ? 'text-accent border-accent fill-accent'
+                            : ''
+                        }`}
+                        title={
+                          isFavourited(listing?._id || listing?.id || id)
+                            ? 'Saved to favourites'
+                            : 'Save to favourites'
+                        }
+                      >
+                        <Heart
+                          className={`w-4 h-4 ${
+                            isFavourited(listing?._id || listing?.id || id) ? 'fill-accent text-accent' : ''
+                          }`}
+                        />
                       </button>
                     </div>
 
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={handleEnquiryClick}
-                      className="w-full h-9 text-[12px]"
-                    >
-                      Send enquiry
-                    </Button>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleEnquiryClick}
+                        className="w-full h-9 text-[12px]"
+                      >
+                        Send enquiry
+                      </Button>
+
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => {
+                          if (!isAuthenticated) {
+                            navigate(`/login?redirect=/listings/${id}`);
+                            return;
+                          }
+                          setIsInspectionModalOpen(true);
+                        }}
+                        className="w-full h-9 text-[12px]"
+                      >
+                        Request viewing
+                      </Button>
+                    </div>
 
                     {!isOwner && (
                       <div className="pt-2 border-t border-border/40 flex justify-center">
@@ -658,6 +742,10 @@ export function VehicleDetailPage() {
             </Carousel>
           </section>
         )}
+        {/* Recently Viewed Carousel */}
+        <div className="max-w-container mx-auto px-4 sm:px-8 lg:px-16">
+          <RecentlyViewedCarousel currentListingId={listing?._id || listing?.id || id} />
+        </div>
       </main>
 
       {/* Mobile Sticky Bottom Bar (< 768px) per UI 7.5 */}
@@ -700,6 +788,15 @@ export function VehicleDetailPage() {
         subjectType="listing"
         subjectRef={listing?._id || listing?.id || id}
         subjectTitle={fullTitle}
+      />
+
+      {/* Inspection Modal */}
+      <InspectionModal
+        isOpen={isInspectionModalOpen}
+        onClose={() => setIsInspectionModalOpen(false)}
+        listingId={listing?._id || listing?.id || id}
+        vehicleTitle={fullTitle}
+        sellerName={seller?.name || 'the seller'}
       />
 
       <Footer />

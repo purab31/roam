@@ -515,7 +515,7 @@ class ListingService {
       }
     }
 
-    // Record view in background
+    // Record view non-blocking in background (must never delay or fail the detail response)
     this.recordListingView(listing._id, listing.ownerRef?.id, user?._id, clientIp);
 
     // Fetch Seller Summary (name, sellerType, joinedAt, and email/mobile if contactVisibility permits)
@@ -800,6 +800,10 @@ class ListingService {
     switch (action) {
       case 'approve':
         listing.adminDeactivated = false;
+        if (!listing.expiresAt) {
+          const expiryDays = await settingsService.getListingExpiryDays();
+          listing.expiresAt = new Date(Date.now() + (expiryDays || 90) * 86400000);
+        }
         transitionModerationStatus(listing, 'approved', context);
 
         // Activate sale/rental per purpose if inactive, preserving existing active/reserved/sold statuses

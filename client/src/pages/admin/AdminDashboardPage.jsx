@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { DashboardLayout } from '../../components/dashboard/DashboardLayout';
 import { Skeleton } from '../../components/ui/Skeleton';
+import { VehicleImage } from '../../components/vehicle/VehicleImage';
 import { formatRupees } from '../../utils/money';
 
 /**
@@ -359,13 +360,13 @@ export function AdminDashboardPage() {
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="w-10 h-10 rounded-xl bg-tile border border-border overflow-hidden shrink-0 flex items-center justify-center p-0.5">
-                          <img
-                            src={l.vehicle?.image || '/placeholders/sedan.svg'}
+                          <VehicleImage
+                            src={l.vehicle?.image || l.vehicle?.images?.[0]?.url}
                             alt=""
+                            bodyType={l.vehicle?.bodyType}
+                            fuelType={l.vehicle?.fuelType}
                             className="w-full h-full object-contain"
-                            onError={e => {
-                              e.currentTarget.src = '/placeholders/sedan.svg';
-                            }}
+                            lazy={true}
                           />
                         </div>
                         <div className="min-w-0">
