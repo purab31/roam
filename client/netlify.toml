@@ -6,7 +6,7 @@
 
 [[redirects]]
   from = "/uploads/images/*"
-  to = "https://roam-api-xv2f.onrender.com/uploads/images/:splat"
+  to = "/images/listings/:splat"
   status = 200
   force = true
 

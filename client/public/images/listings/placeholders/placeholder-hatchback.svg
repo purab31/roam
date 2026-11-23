@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <rect width="800" height="500" fill="#1c1c1e" rx="24"/>
+  <path d="M130 340 L170 340 A 45 45 0 0 1 260 340 L530 340 A 45 45 0 0 1 620 340 L670 340 C 685 340 695 330 695 315 L685 270 C 675 250 645 235 600 230 L520 155 C 500 135 470 130 410 130 L270 130 C 235 130 215 145 195 185 L160 235 C 130 245 115 265 115 290 L115 320 C 115 330 120 340 130 340 Z" fill="#2c2c2e" stroke="#ff5722" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="215" cy="340" r="38" fill="#0a0a0a" stroke="#52525b" stroke-width="8"/>
+  <circle cx="215" cy="340" r="16" fill="#71717a"/>
+  <circle cx="575" cy="340" r="38" fill="#0a0a0a" stroke="#52525b" stroke-width="8"/>
+  <circle cx="575" cy="340" r="16" fill="#71717a"/>
+  <path d="M270 150 L395 150 C 445 150 475 155 495 170 L555 225 L270 225 Z" fill="#18181b" opacity="0.85"/>
+  <path d="M205 185 L250 150 L250 225 L165 225 Z" fill="#18181b" opacity="0.85"/>
+  <text x="400" y="430" fill="#a1a1aa" font-family="sans-serif" font-size="22" font-weight="500" text-anchor="middle" letter-spacing="2">ROAM &bull; URBAN HATCHBACK</text>
+</svg>
