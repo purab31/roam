@@ -75,11 +75,16 @@ export function Header({ activeNav }) {
   return (
     <>
       <header
-        className={`sticky top-0 z-40 w-full h-16 transition-all duration-200 ${
+        className={`sticky top-0 z-40 w-full h-16 transition-all duration-200 bg-bg ${
           isScrolled
-            ? 'bg-bg/85 backdrop-blur-md border-b border-border'
-            : 'bg-bg'
+            ? 'backdrop-blur-md border-b border-border'
+            : ''
         }`}
+        style={{
+          backgroundColor: isScrolled
+            ? 'color-mix(in srgb, var(--bg) 92%, transparent)'
+            : 'var(--bg)',
+        }}
       >
         <div className="flex items-center justify-between h-full max-w-container mx-auto px-4 sm:px-8 lg:px-16">
           {/* Left: Circular Mark + Wordmark */}

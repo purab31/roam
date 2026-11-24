@@ -137,7 +137,7 @@ export function Footer() {
         {/* Bottom Bar: Copyright & Attribution */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-neutral-800 text-[10px] text-neutral-400">
           <p>© {new Date().getFullYear()} Roam Marketplace Inc. All rights reserved.</p>
-          <p>Academic Web Technologies Project • Designed to UI Specification</p>
+          <p>Your Journey starts here</p>
         </div>
       </div>
     </footer>

@@ -409,10 +409,10 @@ export function HomePage() {
                 Register as a dealer
               </Button>
               <Button
-                variant="ghost"
+                variant="secondary"
                 size="lg"
                 onClick={() => navigate('/dealers')}
-                className="w-full sm:w-auto h-12 px-6 text-[13px] text-neutral-400 hover:text-white"
+                className="w-full sm:w-auto h-12 px-6 text-[13px] text-white border-neutral-700 hover:border-white"
               >
                 Find verified dealers
               </Button>
